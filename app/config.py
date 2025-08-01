@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    FLASK_MOD           = getenv("FLASK_MOD")
     DB_HOST             = getenv("DB_HOST")
     DB_PORT             = getenv("DB_PORT")
     DB_NAME             = getenv("DB_NAME")

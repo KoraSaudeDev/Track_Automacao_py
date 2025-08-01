@@ -13,10 +13,12 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     
+    FLASK_MOD = Config.FLASK_MOD == "DEV"
+    
     db.get_connection()
     
-    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        jobs.schedule_task(api_controller.postDistributionEmail)
+    if not FLASK_MOD or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        jobs.schedule_task(api_controller.postDistribution)
     
     app.register_blueprint(track_bp)
     

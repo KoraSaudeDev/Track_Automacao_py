@@ -77,10 +77,6 @@ Este projeto consiste em uma aplicação Flask para automatizar o envio de pesqu
     ```bash
     flask run
     ```
-    Ou diretamente com o `run.py`:
-    ```bash
-    python run.py
-    ```
     A aplicação estará rodando em `http://0.0.0.0:5555` (ou a porta que você definiu em `FLASK_RUN_PORT`).
 
 ## Endpoints da API

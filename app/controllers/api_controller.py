@@ -27,4 +27,5 @@ def postDistributionWhatsapp():
             "cpf":"01010101"
         }
    ]
+    return track_api.postDistributionWhatsapp(survey_uuid,"whatsapp",import_lines)
     

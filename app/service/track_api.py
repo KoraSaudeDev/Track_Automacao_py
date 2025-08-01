@@ -54,7 +54,7 @@ def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines):
     response = requests.request("POST",url=url,headers=headers,json=data)
     try:
         response.raise_for_status()
-        return print("Pesquisa enviada com sucesso para o email! "+str(datetime.now()))
+        return print("Pesquisa enviada com sucesso para o Whatsapp! "+str(datetime.now()))
     except Exception as e:
         return print("Erro: " + e)
     

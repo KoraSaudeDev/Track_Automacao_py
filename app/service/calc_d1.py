@@ -1,0 +1,12 @@
+from datetime import datetime, timedelta
+
+def get_filtered_dates(reference_date=None):
+    if reference_date and isinstance(reference_date, str):
+        reference_date = datetime.fromisoformat(reference_date)
+
+    today = reference_date or datetime.today()
+    target_date = today - timedelta(days=1)
+
+    return [target_date.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]]
+
+#get_filtered_dates("2025-08-05")

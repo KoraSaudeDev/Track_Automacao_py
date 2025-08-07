@@ -1,14 +1,19 @@
-from datetime import datetime
-from flask import jsonify
+import os
 import requests
-from app.config import Config
+from datetime import datetime
+from dotenv import load_dotenv 
+from flask import jsonify
+
+
 
 url_api = "https://api.track.co"
+ORGANIZATION_UUID = os.getenv("ORGANIZATION_UUI")
+API_TOKEN = os.getenv("API_TOKEN")
 
 def getSurveys():
-    url = f"{url_api}/v1/organizations/{Config.ORGANIZATION_UUID}/surveys"
+    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/surveys"
     headers = {
-        "Authorization": f"Bearer {Config.API_TOKEN}"
+        "Authorization": f"Bearer {API_TOKEN}"
     }
     response = requests.request("GET",url,headers=headers)
     try:
@@ -17,9 +22,9 @@ def getSurveys():
         return print(f"Erro na API: {e}")
 
 def postDistribution(survey_uuid,distribution_channel,import_lines):
-    url = f"{url_api}/v1/organizations/{Config.ORGANIZATION_UUID}/distributions"
+    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"
     headers = {
-        "Authorization": f"Bearer {Config.API_TOKEN}"
+        "Authorization": f"Bearer {API_TOKEN}"
     }
     data = {
         "survey_uuid":survey_uuid,
@@ -35,9 +40,9 @@ def postDistribution(survey_uuid,distribution_channel,import_lines):
         return print("Erro: " + e)
 
 def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines): 
-    url = f"{url_api}/v1/organizations/{Config.ORGANIZATION_UUID}/distributions"
+    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"
     headers = {
-        "Authorization": f"Bearer {Config.API_TOKEN}"
+        "Authorization": f"Bearer {API_TOKEN}"
     }   
     data = {
         "survey_uuid":survey_uuid,

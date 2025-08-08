@@ -7,7 +7,7 @@ from flask import jsonify
 
 
 url_api = "https://api.track.co"
-ORGANIZATION_UUID = os.getenv("ORGANIZATION_UUI")
+ORGANIZATION_UUID = os.getenv("ORGANIZATION_UUID")
 API_TOKEN = os.getenv("API_TOKEN")
 
 def getSurveys():
@@ -63,3 +63,21 @@ def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines):
     except Exception as e:
         return print("Erro: " + e)
     
+def postImportLines(survey_uuid,import_lines):
+    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions/createLinkList"
+    headers = {
+        "Authorization": f"Bearer {API_TOKEN}"
+    }
+    data = {
+        "survey_uuid":survey_uuid,
+        "async": False,
+        "import_lines":import_lines,     
+    }
+    response = requests.request("POST",url=url,headers=headers,json=data)
+    print(response)
+    try:
+        print("Pesquisa enviada com sucesso para o email! "+str(datetime.now()))
+        return "teste"
+    except Exception as e:
+        print("Erro: " + e)
+        return  "erro"  

@@ -5,7 +5,8 @@ import pandas as pd
 conn     = db.get_connection("OTO_ING")
 cursor   = conn.cursor()
 
-data     = get_filtered_dates()[0]
+#data     = get_filtered_dates()[0]
+data     = '2024-05-16 18:11:00.000'
 
 def DB_ING_OTO():
 
@@ -110,9 +111,7 @@ def DB_ING_OTO():
 
     cursor.execute(SQL, {'data': data})
 
-    rows      = cursor.fetchall()
-    columns   = [desc[0] for desc in cursor.description]
-    df        = pd.DataFrame(rows, columns=columns)
-    dict_data = df.to_dict(orient='records')
+    df        = pd.DataFrame(cursor.fetchall(),  columns=[col[0] for col in cursor.description])
+    dict_data = df[["NOME_COMPLETO_PACIENTE", "Telefone_Celular", "CPF", "E-MAIL"]].to_dict(orient='records')
 
     return dict_data

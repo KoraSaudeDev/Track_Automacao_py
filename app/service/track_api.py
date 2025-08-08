@@ -2,9 +2,6 @@ import os
 import requests
 import logging
 from datetime import datetime
-from dotenv import load_dotenv 
-from flask import jsonify
-from datetime import datetime
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
 url_api = "https://api.track.co"
@@ -22,7 +19,7 @@ def getSurveys():
         return response.json()
     except Exception as e:
         logging.error(f"[{datetime.now()}] Erro na API: {e}")
-        return []
+        return 
 
 def postDistribution(survey_uuid,distribution_channel,import_lines):
     url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"
@@ -36,13 +33,13 @@ def postDistribution(survey_uuid,distribution_channel,import_lines):
     }
     
     try:
-        response.raise_for_status()
         response = requests.request("POST",url=url,headers=headers,json=data)
-        logging.info(f"[{datetime.now()}] Pesquisa enviada com sucesso para o email! ")
+        response.raise_for_status()
+        logging.info(f"[{datetime.now()}] Pesquisa enviada com sucesso para o email! [{response}]")
         return 
     except Exception as e:
         logging.error(f"[{datetime.now()}] Erro na API: {e}")
-        return []
+        return 
 
 def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines): 
     url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"
@@ -62,13 +59,13 @@ def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines):
             "whatsapp_integration_uuid": "a726be1e-7be0-4add-b983-9c0e46a693db"#uuid fixo da integração      
     }
     try:
-        response.raise_for_status()
         response = requests.request("POST",url=url,headers=headers,json=data)
-        logging.info(f"[{datetime.now()}] Pesquisa enviada com sucesso para o Whatsapp! ")
+        response.raise_for_status()
+        logging.info(f"[{datetime.now()}] Pesquisa enviada com sucesso para o Whatsapp! [{response}]")
         return
     except Exception as e:
         logging.error(f"[{datetime.now()}] Erro na API: {e}")
-        return []
+        return 
     
 #def postImportLines(survey_uuid,import_lines):
 #    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions/createLinkList"

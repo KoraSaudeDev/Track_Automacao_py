@@ -1,5 +1,9 @@
+import logging
+from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.service import track_api
+
+logging.basicConfig(level=logging.INFO,filename="system.log")
 
 scheduler = BackgroundScheduler()
 
@@ -11,12 +15,13 @@ def send_wpp(data, survey_uuid):
 
 def schedule_task(task_func):
     scheduler.add_job(task_func, 'interval', days=1)
-    #scheduler.add_job(task,'interval',seconds=60)
+    #scheduler.add_job(task_func,'interval',seconds=60)
     
 def start_schedulers(data, survey_uuid):
     schedule_task(lambda: send_email(data, survey_uuid))
-    schedule_task(lambda: send_wpp(data, survey_uuid))
-    print("Tarefa agendada")
+    #schedule_task(lambda: send_wpp(data, survey_uuid))
+    logging.warning(f"[{datetime.now()}] Disparo agendado!")
+    print("schedulers iniciado")
     scheduler.start()
     
 

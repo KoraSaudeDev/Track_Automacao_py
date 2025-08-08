@@ -5,8 +5,8 @@ import pandas as pd
 conn     = db.get_connection("OTO_ING")
 cursor   = conn.cursor()
 
-#data     = get_filtered_dates()[0]
-data     = '2024-05-16 18:11:00.000'
+data     = get_filtered_dates()[0]
+#data     = '2024-05-00 18:11:00.000'
 
 def DB_ING_OTO():
 

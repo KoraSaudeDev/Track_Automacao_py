@@ -49,7 +49,14 @@ Serviços auxiliares e integrações externas.
 
 ## Instalação
 
-1. **Clone o repositório**
+0. **Clone o repositório**
+
+1.  **Crie e ative um ambiente virtual (recomendado):**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # No Windows: venv\Scripts\activate
+    ```
+
 2. **Instale as dependências:**
     ```
     pip install -r requirements.txt
@@ -67,7 +74,7 @@ Serviços auxiliares e integrações externas.
     ```
 4. **Execute a aplicação:**
     ```
-    python run.py
+    flask run 
     ```
 
 ---

@@ -14,12 +14,10 @@ def DB_ING_OTO():
     
     '40085'                        "ID_CLIENTE_HFOCUS"
     ,A.HR_ATENDIMENTO               "DATA_BASE" 
-    ,P.NM_PACIENTE                  "NOME_COMPLETO_PACIENTE"
-    ,P.EMAIL                        "E-MAIL"
-    ,P.NR_FONE                      "TELEFONE_RESIDENCIAL"
-    ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "Telefone_Celular"
-    ,P.NR_CELULAR                   "TELEFONE_CELULAR"
-    ,P.NR_CPF                       "CPF"
+    ,P.NM_PACIENTE                  "name"
+    ,P.EMAIL                        "email"
+    ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
+    ,P.NR_CPF                       "cpf"
     ,'PRONTO_SOCORRO_GERAL'         "AREA_PESQUISA"
     ,M.DS_MULTI_EMPRESA             "SEGMENTACAO_1"
     ,'PA_OBSTÉTRICO'                "SEGMENTACAO_2"
@@ -47,12 +45,10 @@ def DB_ING_OTO():
     
     '40085'                        "ID_CLIENTE_HFOCUS"
     ,A.HR_ATENDIMENTO               "DATA_BASE" 
-    ,P.NM_PACIENTE                  "NOME_COMPLETO_PACIENTE"
-    ,P.EMAIL                        "E-MAIL"
-    ,P.NR_FONE                      "TELEFONE_RESIDENCIAL"
-    ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "Telefone_Celular"
-    ,P.NR_CELULAR                   "TELEFONE_CELULAR"
-    ,P.NR_CPF                       "CPF"
+    ,P.NM_PACIENTE                  "name"
+    ,P.EMAIL                        "email"
+    ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
+    ,P.NR_CPF                       "cpf"
     ,'PRONTO_SOCORRO_GERAL'         "AREA_PESQUISA"
     ,M.DS_MULTI_EMPRESA             "SEGMENTACAO_1"
     ,'PA_PEDIATRICO'                "SEGMENTACAO_2"
@@ -79,12 +75,10 @@ def DB_ING_OTO():
     
     '40085'                        "ID_CLIENTE_HFOCUS"
     ,A.HR_ATENDIMENTO               "DATA_BASE" 
-    ,P.NM_PACIENTE                  "NOME_COMPLETO_PACIENTE"
-    ,P.EMAIL                        "E-MAIL"
-    ,P.NR_FONE                      "TELEFONE_RESIDENCIAL"
-    ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "Telefone_Celular"
-    ,P.NR_CELULAR                   "TELEFONE_CELULAR"
-    ,P.NR_CPF                       "CPF"
+    ,P.NM_PACIENTE                  "name"
+    ,P.EMAIL                        "email"
+    ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
+    ,P.NR_CPF                       "cpf"
     ,'PRONTO_SOCORRO_GERAL'         "AREA_PESQUISA"
     ,M.DS_MULTI_EMPRESA             "SEGMENTACAO_1"
     ,'PA_ADULTO'                    "SEGMENTACAO_2"
@@ -107,11 +101,13 @@ def DB_ING_OTO():
 
 
 
-    ORDER BY 9, 10, 8"""
+    ORDER BY 9, 8"""
 
     cursor.execute(SQL, {'data': data})
 
-    df        = pd.DataFrame(cursor.fetchall(),  columns=[col[0] for col in cursor.description])
-    dict_data = df[["NOME_COMPLETO_PACIENTE", "Telefone_Celular", "CPF", "E-MAIL"]].to_dict(orient='records')
+    rows      = cursor.fetchall()
+    columns   = [desc[0] for desc in cursor.description]
+    df        = pd.DataFrame(rows, columns=columns)
+    dict_data = df.to_dict(orient='records')
 
     return dict_data

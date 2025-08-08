@@ -1,10 +1,11 @@
 import os
 import requests
+import logging
 from datetime import datetime
 from dotenv import load_dotenv 
 from flask import jsonify
-
-
+from datetime import datetime
+logging.basicConfig(level=logging.INFO,filename="system.log")
 
 url_api = "https://api.track.co"
 ORGANIZATION_UUID = os.getenv("ORGANIZATION_UUID")
@@ -15,11 +16,13 @@ def getSurveys():
     headers = {
         "Authorization": f"Bearer {API_TOKEN}"
     }
-    response = requests.request("GET",url,headers=headers)
     try:
+        response = requests.request("GET",url,headers=headers)
+        logging.info(f"[{datetime.now()}] Consulta na API realizada ")
         return response.json()
     except Exception as e:
-        return print(f"Erro na API: {e}")
+        logging.error(f"[{datetime.now()}] Erro na API: {e}")
+        return []
 
 def postDistribution(survey_uuid,distribution_channel,import_lines):
     url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"
@@ -32,12 +35,14 @@ def postDistribution(survey_uuid,distribution_channel,import_lines):
         "import_lines":import_lines     
     }
     
-    response = requests.request("POST",url=url,headers=headers,json=data)
     try:
         response.raise_for_status()
-        return print("Pesquisa enviada com sucesso para o email! "+str(datetime.now()))
+        response = requests.request("POST",url=url,headers=headers,json=data)
+        logging.info(f"[{datetime.now()}] Pesquisa enviada com sucesso para o email! ")
+        return 
     except Exception as e:
-        return print("Erro: " + e)
+        logging.error(f"[{datetime.now()}] Erro na API: {e}")
+        return []
 
 def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines): 
     url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"
@@ -56,28 +61,29 @@ def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines):
         },
             "whatsapp_integration_uuid": "a726be1e-7be0-4add-b983-9c0e46a693db"#uuid fixo da integração      
     }
-    response = requests.request("POST",url=url,headers=headers,json=data)
     try:
         response.raise_for_status()
-        return print("Pesquisa enviada com sucesso para o Whatsapp! "+str(datetime.now()))
+        response = requests.request("POST",url=url,headers=headers,json=data)
+        logging.info(f"[{datetime.now()}] Pesquisa enviada com sucesso para o Whatsapp! ")
+        return
     except Exception as e:
-        return print("Erro: " + e)
+        logging.error(f"[{datetime.now()}] Erro na API: {e}")
+        return []
     
-def postImportLines(survey_uuid,import_lines):
-    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions/createLinkList"
-    headers = {
-        "Authorization": f"Bearer {API_TOKEN}"
-    }
-    data = {
-        "survey_uuid":survey_uuid,
-        "async": False,
-        "import_lines":import_lines,     
-    }
-    response = requests.request("POST",url=url,headers=headers,json=data)
-    print(response)
-    try:
-        print("Pesquisa enviada com sucesso para o email! "+str(datetime.now()))
-        return "teste"
-    except Exception as e:
-        print("Erro: " + e)
-        return  "erro"  
+#def postImportLines(survey_uuid,import_lines):
+#    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions/createLinkList"
+#    headers = {
+#        "Authorization": f"Bearer {API_TOKEN}"
+#    }
+#    data = {
+#        "survey_uuid":survey_uuid,
+#        "async": False,
+#        "import_lines":import_lines,     
+#    }
+#    try:
+#        response = requests.request("POST",url=url,headers=headers,json=data)
+#        print("Pesquisa enviada com sucesso para o email! "+str(datetime.now()))
+#        return "teste"
+#    except Exception as e:
+#        print("Erro: " + e)
+#        return  "erro"  

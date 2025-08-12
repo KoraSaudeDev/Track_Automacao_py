@@ -18,12 +18,15 @@ def schedule_task(task_func):
     #scheduler.add_job(task_func,'interval',seconds=60)
     
 def start_schedulers(data):
+    if(data == None or len(data) == 0):
+        print(f"sem dados")
+        return
     survey_uuid = data[0]['uuid']
     #schedule_task(lambda: send_email(data, survey_uuid))
     #schedule_task(lambda: send_wpp(data, survey_uuid))
-    print(data)
-    logging.warning(f"[{datetime.now()}] Disparo agendado!")
-    print("schedulers iniciado")
+    print(data[0])
+    logging.warning(f"[{datetime.now()}] - {data[0]['Segmentacao_1']} - {data[0]['Segmentacao_2']}  - Disparo agendado!")
+    print(f"{data[0]['Segmentacao_1']} - {data[0]['Segmentacao_2']} -  schedulers iniciado")
     if not scheduler.running:
         scheduler.start()
     else:

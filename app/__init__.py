@@ -4,7 +4,22 @@ from flask_cors import CORS
 from .routes.api_router import track_bp
 from app.scheduler import automations
 
+#HUB ES:
+#HMS - MERIDIONAL SERRA
+#HPC - MERIDIONAL PRAIA DA COSTA
+#HMV - MERIDIONAL VITORIA
+#HMC - MERIDIONAL CARIACICA
+#HSF - HOSPITAL SÃO FRANCISCO
+#HSL - HOSPITAL SÃO LUIZ
+#HMSM - MERIDIONAL SÃO MATEUS
+
 automations.start('HMS')
+automations.start('HMC')
+automations.start('HPC')
+automations.start('HMSM')
+automations.start('HSL')
+automations.start('HSF')
+#automations.start('OTO_ING')
 
 def create_app():
     app = Flask(__name__)

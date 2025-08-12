@@ -4,12 +4,28 @@ import pandas as pd
 from app.service.calc_d1 import get_filtered_dates
 from app.db import db
 
-def DB():
+
+def DB(db_mv):
+    if db_mv == 'HMS':
+        hospital = 'MERIDIONAL_SERRA'
+    elif db_mv == 'HMC':
+        hospital = 'MERIDIONAL_CARIACICA'   
+    elif db_mv == 'HPC':
+        hospital = 'MERIDIONAL_PRAIA_DA_COSTA'
+    elif db_mv == 'HMV':
+        hospital = 'MERIDIONAL_VITORIA'
+    elif db_mv == 'HSF':
+        hospital = 'HOSPITAL_SÃO_FRANCISCO'
+    elif db_mv == 'HSL':
+        hospital = 'HOSPITAL_SÃO_LUIZ'
+    elif db_mv == 'HMSM':
+        hospital = 'HOSPITAL_SÃO_MATEUS'
+
     try:
-        conn     = db.get_connection("HMS")
+        conn     = db.get_connection(db_mv)
         cursor   = conn.cursor()
 
-        #data     = get_filtered_dates()[0]
+        data     = get_filtered_dates()[0]
         data     = '2024-05-10 18:11:00.000'
         SQL01 = """select -- Pacientes Ambulatório HMS
                  '40085'                             "ID_Cliente_Hfocus"
@@ -19,7 +35,7 @@ def DB():
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
                 ,p.nr_cpf                       "cpf"
                 ,'AMBULATORIO'                  "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+                ,:hospital                      "Segmentacao_1"
                 ,s.ds_ser_dis                   "Segmentacao_2"
                 from
                  dbamv.paciente    p
@@ -43,7 +59,7 @@ def DB():
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
                 ,p.nr_cpf                       "cpf"
                 ,'AMBULATORIO'                  "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+                ,:hospital                      "Segmentacao_1"
                 ,'GERAL_AMBULATORIO'            "Segmentacao_2"
                 from
                  dbamv.paciente    p
@@ -66,7 +82,7 @@ def DB():
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
                 ,p.nr_cpf                       "cpf"
                 ,'EXAMES'                       "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+                ,:hospital                      "Segmentacao_1"
                 ,'HEMODINAMICA'                 "Segmentacao_2"
                 from
                  dbamv.paciente    p
@@ -88,7 +104,7 @@ def DB():
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
                 ,p.nr_cpf                       "cpf"
                 ,'EXAMES'                        "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'       "Segmentacao_1"
+                ,:hospital                 "Segmntacao_1"
                 ,'LABORATORIO'                 "Segmentacao_2"
                 from
                  dbamv.paciente    p
@@ -104,12 +120,12 @@ def DB():
                 select -- Pacientes Internados Com Alta Diferente de óbito
                  '40085'                             "ID_Cliente_Hfocus"
                 ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "Nome_Completo_Paciente"
-                ,p.email                        "E-mail"
+                ,p.nm_paciente                  "name"
+                ,p.email                        "email"
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "CPF"
+                ,p.nr_cpf                       "cpf"
                 ,'INTERNACAO'                   "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+                ,:hospital                      "Segmentacao_1"
                 ,'INTERNACAO'                   "Segmentacao_2"
 
                 from
@@ -129,12 +145,12 @@ def DB():
                 select -- Pacientes Externos HMS - EXTERNO CC AMB
                  '40085'                             "ID_Cliente_Hfocus"
                 ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "Nome_Completo_Paciente"
-                ,p.email                        "E-mail"
+                ,p.nm_paciente                  "name"
+                ,p.email                        "email"
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "CPF"
+                ,p.nr_cpf                       "cpf"
                 ,'HOSPITAL_DIA'                 "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+                ,:hospital                      "Segmentacao_1"
                 ,'INTERNACAO'                   "Segmentacao_2"
 
                 from
@@ -156,7 +172,7 @@ def DB():
             ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
             ,p.nr_cpf                       "cpf"
             ,'MATERNIDADE'                  "Area_Pesquisa"
-            ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+            ,:hospital                      "Segmentacao_1"
             ,'MATERNIDADE'                  "Segmentacao_2"
             from
              dbamv.paciente    p
@@ -179,7 +195,7 @@ def DB():
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
                 ,p.nr_cpf                       "cpf"
                 ,'PRONTO_SOCORRO_GERAL'         "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+                ,:hospital                      "Segmentacao_1"
                 ,'PA_OBSTÉTRICO'                "Segmentacao_2"
 
                 from
@@ -204,7 +220,7 @@ def DB():
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
                 ,p.nr_cpf                       "cpf"
                 ,'PRONTO_SOCORRO_GERAL'         "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+                ,:hospital                      "Segmentacao_1"
                 ,'PA_PEDIATRICO'                "Segmentacao_2"
 
                 from
@@ -229,7 +245,7 @@ def DB():
                 ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
                 ,p.nr_cpf                       "cpf"
                 ,'PRONTO_SOCORRO_GERAL'         "Area_Pesquisa"
-                ,'MERIDIONAL_SERRA'             "Segmentacao_1"
+                ,:hospital                      "Segmentacao_1"
                 ,'PA_ADULTO'                    "Segmentacao_2"
 
                 from
@@ -244,6 +260,31 @@ def DB():
                 and a.cd_tip_res not in (1,4,11)
                 and to_char(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
                 """
+        SQL06 = """"
+            select -- PACIENTES ONCOLOGIA HMS ID - 155005
+             '40085'                        "ID_Cliente_Hfocus"
+            ,a.hr_atendimento               "Data_Base" 
+            ,p.nm_paciente                  "name"
+            ,p.email                        "email"
+            ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
+            ,p.nr_cpf                       "cpf"
+            ,'ONCOLOGIA'                    "Area_Pesquisa"
+            ,:hospital                      "Segmentacao_1"
+            ,'ONCOLOGIA'                    "Segmentacao_2"
+
+
+            from
+             dbamv.paciente@HM_METROPOL  p
+            ,dbamv.atendime@HM_METROPOL  a
+
+            where
+                p.cd_paciente = a.cd_paciente
+            and a.tp_atendimento = 'A'
+            and a.cd_ori_ate = 21
+
+            and to_char(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+        """
+        
         SQL = f"""
         {SQL01}
         UNION
@@ -256,8 +297,7 @@ def DB():
         {SQL05}
         ORDER BY 9,8
         """
-
-        cursor.execute(SQL, {'data': data})
+        cursor.execute(SQL, {'hospital': hospital, 'data': data})
 
         rows      = cursor.fetchall()
         columns   = [desc[0] for desc in cursor.description]

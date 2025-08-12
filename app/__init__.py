@@ -4,7 +4,7 @@ from flask_cors import CORS
 from .routes.api_router import track_bp
 from app.scheduler import automations
 
-automations.start()
+automations.start('HMS')
 
 def create_app():
     app = Flask(__name__)

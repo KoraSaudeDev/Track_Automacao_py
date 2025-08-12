@@ -67,20 +67,21 @@ def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines):
         logging.error(f"[{datetime.now()}] Erro na API: {e}")
         return 
     
-#def postImportLines(survey_uuid,import_lines):
-#    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions/createLinkList"
-#    headers = {
-#        "Authorization": f"Bearer {API_TOKEN}"
-#    }
-#    data = {
-#        "survey_uuid":survey_uuid,
-#        "async": False,
-#        "import_lines":import_lines,     
-#    }
-#    try:
-#        response = requests.request("POST",url=url,headers=headers,json=data)
-#        print("Pesquisa enviada com sucesso para o email! "+str(datetime.now()))
-#        return "teste"
-#    except Exception as e:
-#        print("Erro: " + e)
-#        return  "erro"  
+def postImportLines(survey_uuid,import_lines):
+   url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions/createLinkList"
+   headers = {
+       "Authorization": f"Bearer {API_TOKEN}"
+   }
+   data = {
+       "survey_uuid":survey_uuid,
+       "async": False,
+       "shortened_link": False,
+       "import_lines":import_lines,     
+   }
+   try:
+       response = requests.request("POST",url=url,headers=headers,json=data)
+       print("Cliente selecionado "+str(datetime.now()))
+       return response.json()
+   except Exception as e:
+       print(f"Erro na API: {e}")
+       return  f"erro {e}"  

@@ -302,6 +302,7 @@ def DB(db_mv):
         rows      = cursor.fetchall()
         columns   = [desc[0] for desc in cursor.description]
         df        = pd.DataFrame(rows, columns=columns)
+        df["Data_Base"] = pd.to_datetime(df["Data_Base"]).dt.strftime("%Y-%m-%d %H:%M:%S")
         dict_data = df.to_dict(orient='records')
 
         return dict_data

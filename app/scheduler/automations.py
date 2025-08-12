@@ -33,6 +33,9 @@ def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=
     ambulatorio = []
     #oncologia = []
     data_list = DBHMS.DB(hospital)
+    if(data_list == None or len(data_list) == 0):
+        print(f"sem dados")
+        return
     for data in data_list:
         if data["Area_Pesquisa"] == "AMBULATORIO":
             ambulatorio.append({**data, "uuid": uuid_amb})
@@ -66,7 +69,7 @@ def start(hospital):
                       uuid_exa='d1f2c3b4-a5b6-7c8d-9e0f-1a2b3c4d5e6f', 
                       uuid_int='12345678-1234-5678-1234-567812345678', 
                       uuid_mat='23456789-2345-6789-2345-678923456789',
-                      uuid_ps='34567890-3456-7890-3456-789034567890'
+                      uuid_ps='a0877963-76f0-4868-9444-8ba21590f676'
                       )
 
     #schedulers.start_schedulers(data=data["ambulatorio"])

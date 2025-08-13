@@ -46,12 +46,12 @@ def start(hospital):
 
     print("Iniciando automações...")
     data = data_search(hospital=hospital,
-                      uuid_amb='e0be9e84-b80e-4f4c-93ca-f947b0a182e0', 
-                      uuid_exa='d1f2c3b4-a5b6-7c8d-9e0f-1a2b3c4d5e6f', 
-                      uuid_int='12345678-1234-5678-1234-567812345678', 
-                      uuid_mat='23456789-2345-6789-2345-678923456789',
+                      uuid_amb='913ef30e-6e75-45b6-acdd-eb78e1bb4626', 
+                      uuid_exa='ed7bd007-0dd9-4b0d-9e08-c0dbf2cdfb3c', 
+                      uuid_int='2a2b33c5-a390-47c7-8914-48a396ced12b', 
+                      uuid_mat='291ac361-6ee5-4054-9a53-22653fbf2728',
                       uuid_ps='a0877963-76f0-4868-9444-8ba21590f676',
-                      uuid_onc='a726be1e-7be0-4add-b983-9c0e46a693db'
+                      uuid_onc='0eced015-e625-4381-9ae3-1ecaf6bf5320'
                       )
     if data is None or len(data) == 0:
         logging.warning(f"[{datetime.now()}] - Sem dados para {hospital}")

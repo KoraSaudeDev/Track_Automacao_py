@@ -28,280 +28,122 @@ def DB(db_mv):
         data     = get_filtered_dates()[0]
         #data     = '2024-05-10 18:11:00.000'
         #data     = '2013-04-29 00:00:00.000'
-        SQL01 = """select -- Pacientes Ambulatório HMS
-                 '40085'                             "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'AMBULATORIO'                  "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,s.ds_ser_dis                   "Segmentacao_2"
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-                ,dbamv.ser_dis     s
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'A'
-                and a.cd_ser_dis = s.cd_ser_dis
-                and s.cd_ser_dis in (6,2,3,76,85,30,51,11)
-                --and a.cd_tip_res not in (6,17,21)
-                and to_char(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+        SQL = """
+            -- Bloco 1: Pacientes de Ambulatório, Oncologia e Hospital Dia (tp_atendimento = 'A')
+            SELECT
+                '40085' AS "ID_Cliente_Hfocus",
+                A.HR_ATENDIMENTO AS "Data_Base",
+                P.NM_PACIENTE AS "name",
+                P.EMAIL AS "email",
+                (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
+                P.NR_CPF AS "cpf",
+                CASE
+                    WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
+                    WHEN A.CD_ORI_ATE = 9 THEN 'HOSPITAL_DIA'
+                    ELSE 'AMBULATORIO'
+                END AS "Area_Pesquisa",
+                :hospital AS "Segmentacao_1",
+                CASE
+                    WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
+                    WHEN A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
+                    WHEN A.CD_SER_DIS IN (6, 2, 3, 76, 85, 30, 51, 11) THEN S.DS_SER_DIS
+                    ELSE 'GERAL_AMBULATORIO'
+                END AS "Segmentacao_2"
+            FROM
+                DBAMV.ATENDIME A
+            INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+            LEFT JOIN DBAMV.SER_DIS S ON A.CD_SER_DIS = S.CD_SER_DIS
+            WHERE
+                A.TP_ATENDIMENTO = 'A'
+                AND TRUNC(A.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            
+            UNION ALL
+            
+            -- Bloco 2: Pacientes de Exames Externos (tp_atendimento = 'E')
+            SELECT
+                '40085' AS "ID_Cliente_Hfocus",
+                A.HR_ATENDIMENTO AS "Data_Base",
+                P.NM_PACIENTE AS "name",
+                P.EMAIL AS "email",
+                (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
+                P.NR_CPF AS "cpf",
+                'EXAMES' AS "Area_Pesquisa",
+                :hospital AS "Segmentacao_1",
+                CASE
+                    WHEN A.CD_ORI_ATE = 46 THEN 'HEMODINAMICA'
+                    WHEN A.CD_ORI_ATE = 7 THEN 'LABORATORIO'
+                END AS "Segmentacao_2"
+            FROM
+                DBAMV.ATENDIME A
+            INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+            WHERE
+                A.TP_ATENDIMENTO = 'E'
+                AND A.CD_ORI_ATE IN (46, 7)
+                AND TRUNC(A.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            
+            UNION ALL
+            
+            -- Bloco 3: Pacientes Internados (Geral e Maternidade) (tp_atendimento = 'I')
+            SELECT
+                '40085' AS "ID_Cliente_Hfocus",
+                A.HR_ATENDIMENTO AS "Data_Base",
+                P.NM_PACIENTE AS "name",
+                P.EMAIL AS "email",
+                (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
+                P.NR_CPF AS "cpf",
+                CASE
+                    WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
+                    ELSE 'INTERNACAO'
+                END AS "Area_Pesquisa",
+                :hospital AS "Segmentacao_1",
+                CASE
+                    WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
+                    ELSE 'INTERNACAO'
+                END AS "Segmentacao_2"
+            FROM
+                DBAMV.ATENDIME A
+            INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+            -- LEFT JOIN para identificar se o atendimento é um atendimento "pai" (mãe na maternidade)
+            LEFT JOIN DBAMV.ATENDIME A2 ON A.CD_ATENDIMENTO = A2.CD_ATENDIMENTO_PAI
+            WHERE
+                A.TP_ATENDIMENTO = 'I'
+                AND A.CD_MOT_ALT NOT IN (6, 7, 9, 17, 18, 19, 20, 21, 22)
+                -- Lógica para incluir Maternidade OU Internação Geral (que não seja da maternidade)
+                AND (
+                    A2.CD_ATENDIMENTO_PAI IS NOT NULL -- Condição da Maternidade
+                    OR 
+                    (A.CD_ATENDIMENTO_PAI IS NULL AND A.CD_CID NOT IN ('O60','O80','O82','O84','O757','O800','O801','O809','O810','O820','O821','O822','O829','O839','O840','O842','Z380','Z382')) -- Condição de Internação Geral
+                )
+                AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            
+            UNION ALL
+            
+            -- Bloco 4: Pacientes de Pronto Socorro (tp_atendimento = 'U')
+            SELECT DISTINCT 
+                '40085' AS "ID_Cliente_Hfocus",
+                A.HR_ATENDIMENTO AS "Data_Base",
+                P.NM_PACIENTE AS "name",
+                P.EMAIL AS "email",
+                (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
+                P.NR_CPF AS "cpf",
+                'PRONTO_SOCORRO_GERAL' AS "Area_Pesquisa",
+                :hospital AS "Segmentacao_1",
+                CASE
+                    WHEN A.CD_SERVICO = 1 THEN 'PA_OBSTÉTRICO'
+                    WHEN A.CD_SERVICO = 27 THEN 'PA_PEDIATRICO'
+                    ELSE 'PA_ADULTO'
+                END AS "Segmentacao_2"
+            FROM
+                DBAMV.ATENDIME A
+            INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+            WHERE
+                A.TP_ATENDIMENTO = 'U'
+                AND A.CD_TIP_RES NOT IN (1, 4, 11)
+                AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            
+            ORDER BY
+                "Segmentacao_2", "Segmentacao_1"
 
-                UNION
-
-                select -- Pacientes Ambulatório HMS
-                 '40085'                             "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'AMBULATORIO'                  "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,'GERAL_AMBULATORIO'            "Segmentacao_2"
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-                ,dbamv.ser_dis     s
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'A'
-                and a.cd_ser_dis = s.cd_ser_dis
-                and s.cd_ser_dis not in (6,2,3,76,85,30,51,11)
-                --and a.cd_tip_res not in (6,17,21)
-                and to_char(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-         """
-        SQL02 = """-- Pacientes Externos HMS - EXTERNO HEMODINAMICA
-                select
-                 '40085'                        "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'EXAMES'                       "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,'HEMODINAMICA'                 "Segmentacao_2"
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'E'
-                and a.cd_ori_ate = 46 
-                and to_char(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
-                UNION
-
-                select -- Pacientes Externos HMS - EXTERNO HEMODINAMICA
-                 '40085'                             "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'EXAMES'                        "Area_Pesquisa"
-                ,:hospital                 "Segmntacao_1"
-                ,'LABORATORIO'                 "Segmentacao_2"
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'E'
-                and a.cd_ori_ate = 7 
-                and to_char(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-                """
-        SQL03 = """
-                select -- Pacientes Internados Com Alta Diferente de óbito
-                 '40085'                             "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'INTERNACAO'                   "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,'INTERNACAO'                   "Segmentacao_2"
-
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'I'
-                and a.CD_CID not in ('O60','O80','O82','O84','O757','O800','O801','O809','O810','O820','O821','O822','O829','O839','O840','O842','Z380','Z382')
-                and a.cd_atendimento_pai is null
-                and a.cd_mot_alt not in (6,7,9,17,18,19,20,21,22)
-                and trunc(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
-                union
-
-                select -- Pacientes Externos HMS - EXTERNO CC AMB
-                 '40085'                             "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'HOSPITAL_DIA'                 "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,'INTERNACAO'                   "Segmentacao_2"
-
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'A'
-                and a.cd_ori_ate = 9
-                and trunc(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-        """
-        SQL04 = """
-            select -- Pacientes Internados Maternidade HMSM
-             '40085'                        "ID_Cliente_Hfocus"
-            ,a.hr_atendimento               "Data_Base" 
-            ,p.nm_paciente                  "name"
-            ,p.email                        "email"
-            ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-            ,p.nr_cpf                       "cpf"
-            ,'MATERNIDADE'                  "Area_Pesquisa"
-            ,:hospital                      "Segmentacao_1"
-            ,'MATERNIDADE'                  "Segmentacao_2"
-            from
-             dbamv.paciente    p
-            ,dbamv.atendime    a
-            ,dbamv.atendime    a2
-
-            where
-                p.cd_paciente = a.cd_paciente
-            and a.tp_atendimento = 'I'
-            and a.cd_mot_alt not in (6,7,9,17,18,19,20,21,22)
-            and a.CD_ATENDIMENTO = a2.CD_ATENDIMENTO_PAI
-            and to_char(a.DT_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-         """
-        SQL05 = """
-                select distinct-- Pacientes PS HMS
-                 '40085'                        "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'PRONTO_SOCORRO_GERAL'         "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,'PA_OBSTÉTRICO'                "Segmentacao_2"
-
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-                ,dbamv.servico     s
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'U'
-                and a.cd_Servico = s.cd_servico
-                and a.cd_servico = 1
-                and a.cd_tip_res not in (1,4,11)
-                and to_char(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
-                UNION
-
-                select distinct-- Pacientes PS HMS
-                 '40085'                         "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'PRONTO_SOCORRO_GERAL'         "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,'PA_PEDIATRICO'                "Segmentacao_2"
-
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-                ,dbamv.servico     s
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'U'
-                and a.cd_Servico = s.cd_servico
-                and a.cd_servico = 27
-                and a.cd_tip_res not in (1,4,11)
-                and to_char(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
-                UNION
-
-                select distinct-- Pacientes PS HMS
-                 '40085'                         "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "name"
-                ,p.email                        "email"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "cpf"
-                ,'PRONTO_SOCORRO_GERAL'         "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,'PA_ADULTO'                    "Segmentacao_2"
-
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-                ,dbamv.servico     s
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'U'
-                and a.cd_Servico = s.cd_servico
-                and a.cd_servico not in (1,27)
-                and a.cd_tip_res not in (1,4,11)
-                and to_char(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-                """
-        SQL06 = """
-                select -- Pacientes ONCOLOGIA Consulta 
-                 '40085'                        "ID_Cliente_Hfocus"
-                ,a.hr_atendimento               "Data_Base" 
-                ,p.nm_paciente                  "Nome_Completo_Paciente"
-                ,p.email                        "E-mail"
-                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-                ,p.nr_cpf                       "CPF"
-                ,'ONCOLOGIA'                    "Area_Pesquisa"
-                ,:hospital                      "Segmentacao_1"
-                ,'ONCOLOGIA'                    "Segmentacao_2"
-                
-                
-                from
-                 dbamv.paciente    p
-                ,dbamv.atendime    a
-                
-                where
-                    p.cd_paciente = a.cd_paciente
-                and a.tp_atendimento = 'A'
-                and a.cd_ori_ate in (6,18,27)
-                --and a.cd_ser_dis in (32)
-                --and a.cd_tip_res not in (6,17,21)
-                and to_char(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
-
-        """
-        
-        SQL = f"""
-        {SQL01}
-        UNION
-        {SQL02}
-        UNION
-        {SQL03}
-        UNION
-        {SQL04}
-        UNION
-        {SQL05}
-        UNION
-        {SQL06}
-        ORDER BY 9,8
         """
         cursor.execute(SQL, {'hospital': hospital, 'data': data})
 

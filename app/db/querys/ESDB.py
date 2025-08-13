@@ -26,7 +26,8 @@ def DB(db_mv):
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
-        data     = '2024-05-10 18:11:00.000'
+        #data     = '2024-05-10 18:11:00.000'
+        #data     = '2013-04-29 00:00:00.000'
         SQL01 = """select -- Pacientes Ambulatório HMS
                  '40085'                             "ID_Cliente_Hfocus"
                 ,a.hr_atendimento               "Data_Base" 
@@ -260,29 +261,32 @@ def DB(db_mv):
                 and a.cd_tip_res not in (1,4,11)
                 and to_char(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
                 """
-        SQL06 = """"
-            select -- PACIENTES ONCOLOGIA HMS ID - 155005
-             '40085'                        "ID_Cliente_Hfocus"
-            ,a.hr_atendimento               "Data_Base" 
-            ,p.nm_paciente                  "name"
-            ,p.email                        "email"
-            ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
-            ,p.nr_cpf                       "cpf"
-            ,'ONCOLOGIA'                    "Area_Pesquisa"
-            ,:hospital                      "Segmentacao_1"
-            ,'ONCOLOGIA'                    "Segmentacao_2"
+        SQL06 = """
+                select -- Pacientes ONCOLOGIA Consulta 
+                 '40085'                        "ID_Cliente_Hfocus"
+                ,a.hr_atendimento               "Data_Base" 
+                ,p.nm_paciente                  "Nome_Completo_Paciente"
+                ,p.email                        "E-mail"
+                ,(NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) "phone"
+                ,p.nr_cpf                       "CPF"
+                ,'ONCOLOGIA'                    "Area_Pesquisa"
+                ,:hospital                      "Segmentacao_1"
+                ,'ONCOLOGIA'                    "Segmentacao_2"
+                
+                
+                from
+                 dbamv.paciente    p
+                ,dbamv.atendime    a
+                
+                where
+                    p.cd_paciente = a.cd_paciente
+                and a.tp_atendimento = 'A'
+                and a.cd_ori_ate in (6,18,27)
+                --and a.cd_ser_dis in (32)
+                --and a.cd_tip_res not in (6,17,21)
+                and to_char(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
 
 
-            from
-             dbamv.paciente@HM_METROPOL  p
-            ,dbamv.atendime@HM_METROPOL  a
-
-            where
-                p.cd_paciente = a.cd_paciente
-            and a.tp_atendimento = 'A'
-            and a.cd_ori_ate = 21
-
-            and to_char(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
         """
         
         SQL = f"""
@@ -295,6 +299,8 @@ def DB(db_mv):
         {SQL04}
         UNION
         {SQL05}
+        UNION
+        {SQL06}
         ORDER BY 9,8
         """
         cursor.execute(SQL, {'hospital': hospital, 'data': data})

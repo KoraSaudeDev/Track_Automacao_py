@@ -84,4 +84,4 @@ def postImportLines(survey_uuid,import_lines):
        return response.json()
    except Exception as e:
        print(f"Erro na API: {e}")
-       return  f"erro {e}"  
+       return   

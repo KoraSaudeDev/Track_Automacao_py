@@ -1,14 +1,19 @@
 import logging
 from datetime import datetime
 from app.scheduler import schedulers
-from app.db.querys import ESDB
+from app.db.querys import ESDB,ING_OTO
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
 
 def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=None, uuid_ps=None,uuid_onc=None):
     
-    data_list = ESDB.DB(hospital)
+    if hospital in ['HMS', 'HMC', 'HPC', 'HMV', 'HSF', 'HSL', 'HMSM']:
+        dbHospital = ESDB
+    else:
+        dbHospital = ING_OTO
+
+    data_list = dbHospital.DB(hospital)
     internacao = []
     exames = []
     maternidade = []   
@@ -20,17 +25,17 @@ def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=
         print(f"sem dados")
         return
     for data in data_list:
-        if data["Area_Pesquisa"] == "AMBULATORIO":
+        if data["area_pesquisa"] == "AMBULATORIO":
             ambulatorio.append({**data, "uuid": uuid_amb})
-        elif data["Area_Pesquisa"] == "EXAMES":
+        elif data["area_pesquisa"] == "EXAMES":
             exames.append({**data, "uuid": uuid_exa})     
-        elif data["Area_Pesquisa"] == "INTERNACAO":
+        elif data["area_pesquisa"] == "INTERNACAO":
             internacao.append({**data, "uuid": uuid_int})
-        elif data["Area_Pesquisa"] == "MATERNIDADE":
+        elif data["area_pesquisa"] == "MATERNIDADE":
             maternidade.append({**data, "uuid": uuid_mat})    
-        elif data["Area_Pesquisa"] == "PRONTO_SOCORRO_GERAL":
+        elif data["area_pesquisa"] == "PRONTO_SOCORRO_GERAL":
             pronto_socorro.append({**data, "uuid": uuid_ps})
-        elif data["Area_Pesquisa"] == "ONCOLOGIA":
+        elif data["area_pesquisa"] == "ONCOLOGIA":
            oncologia.append({**data, "uuid": uuid_onc})
     return {
         "ambulatorio": ambulatorio,

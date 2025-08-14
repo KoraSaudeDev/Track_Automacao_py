@@ -41,7 +41,7 @@ def DB(db_mv):
                     WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
                     WHEN A.CD_ORI_ATE = 9 THEN 'HOSPITAL_DIA'
                     ELSE 'AMBULATORIO'
-                END AS "Area_Pesquisa",
+                END AS "area_pesquisa",
                 :hospital AS "Segmentacao_1",
                 CASE
                     WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
@@ -67,7 +67,7 @@ def DB(db_mv):
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
-                'EXAMES' AS "Area_Pesquisa",
+                'EXAMES' AS "area_pesquisa",
                 :hospital AS "Segmentacao_1",
                 CASE
                     WHEN A.CD_ORI_ATE = 46 THEN 'HEMODINAMICA'
@@ -94,7 +94,7 @@ def DB(db_mv):
                 CASE
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
-                END AS "Area_Pesquisa",
+                END AS "area_pesquisa",
                 :hospital AS "Segmentacao_1",
                 CASE
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
@@ -126,7 +126,7 @@ def DB(db_mv):
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
-                'PRONTO_SOCORRO_GERAL' AS "Area_Pesquisa",
+                'PRONTO_SOCORRO_GERAL' AS "area_pesquisa",
                 :hospital AS "Segmentacao_1",
                 CASE
                     WHEN A.CD_SERVICO = 1 THEN 'PA_OBSTÉTRICO'

@@ -27,11 +27,13 @@ def start_schedulers(data):
     survey_uuid = data[0]['uuid']
     #schedule_task(lambda: send_email(data, survey_uuid))
     #schedule_task(lambda: send_wpp(data, survey_uuid))
-    schedule_task(lambda: send_teste([data[0]], survey_uuid))
+    #schedule_task(lambda: send_teste([data[0]], survey_uuid))
+
+    print(data[0])
     
-    print(f"[{datetime.now()}] - {data[0]['Segmentacao_1']} - {data[0]['Segmentacao_2']}  - Disparo agendado!")
-    logging.warning(f"[{datetime.now()}] - {data[0]['Segmentacao_1']} - {data[0]['Segmentacao_2']}  - Disparo agendado!")
-    print(f"{data[0]['Segmentacao_1']} - {data[0]['Segmentacao_2']} -  schedulers iniciado")
+    print(f"[{datetime.now()}] - {data[0]['unidade']} - {data[0]['setor']}  - Disparo agendado!")
+    logging.warning(f"[{datetime.now()}] - {data[0]['unidade']} - {data[0]['setor']}  - Disparo agendado!")
+    print(f"{data[0]['unidade']} - {data[0]['setor']} -  schedulers iniciado")
     if not scheduler.running:
         scheduler.start()
     else:

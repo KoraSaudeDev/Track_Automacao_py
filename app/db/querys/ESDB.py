@@ -32,9 +32,10 @@ def DB(db_mv):
             -- Bloco 1: Pacientes de Ambulatório, Oncologia e Hospital Dia (tp_atendimento = 'A')
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
-                A.HR_ATENDIMENTO AS "Data_Base",
+                A.HR_ATENDIMENTO AS "data_atendimento",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
+                PR.NM_PRESTADOR AS "medico",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 CASE
@@ -42,16 +43,17 @@ def DB(db_mv):
                     WHEN A.CD_ORI_ATE = 9 THEN 'HOSPITAL_DIA'
                     ELSE 'AMBULATORIO'
                 END AS "area_pesquisa",
-                :hospital AS "Segmentacao_1",
+                :hospital AS "unidade",
                 CASE
                     WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
                     WHEN A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
                     WHEN A.CD_SER_DIS IN (6, 2, 3, 76, 85, 30, 51, 11) THEN S.DS_SER_DIS
                     ELSE 'GERAL_AMBULATORIO'
-                END AS "Segmentacao_2"
+                END AS "setor"
             FROM
                 DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             LEFT JOIN DBAMV.SER_DIS S ON A.CD_SER_DIS = S.CD_SER_DIS
             WHERE
                 A.TP_ATENDIMENTO = 'A'
@@ -62,20 +64,22 @@ def DB(db_mv):
             -- Bloco 2: Pacientes de Exames Externos (tp_atendimento = 'E')
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
-                A.HR_ATENDIMENTO AS "Data_Base",
+                A.HR_ATENDIMENTO AS "data_atendimento",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
+                PR.NM_PRESTADOR AS "medico",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'EXAMES' AS "area_pesquisa",
-                :hospital AS "Segmentacao_1",
+                :hospital AS "unidade",
                 CASE
                     WHEN A.CD_ORI_ATE = 46 THEN 'HEMODINAMICA'
                     WHEN A.CD_ORI_ATE = 7 THEN 'LABORATORIO'
-                END AS "Segmentacao_2"
+                END AS "setor"
             FROM
                 DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE
                 A.TP_ATENDIMENTO = 'E'
                 AND A.CD_ORI_ATE IN (46, 7)
@@ -86,23 +90,25 @@ def DB(db_mv):
             -- Bloco 3: Pacientes Internados (Geral e Maternidade) (tp_atendimento = 'I')
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
-                A.HR_ATENDIMENTO AS "Data_Base",
+                A.HR_ATENDIMENTO AS "data_atendimento",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
+                PR.NM_PRESTADOR AS "medico",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 CASE
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
                 END AS "area_pesquisa",
-                :hospital AS "Segmentacao_1",
+                :hospital AS "unidade",
                 CASE
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
-                END AS "Segmentacao_2"
+                END AS "setor"
             FROM
                 DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             -- LEFT JOIN para identificar se o atendimento é um atendimento "pai" (mãe na maternidade)
             LEFT JOIN DBAMV.ATENDIME A2 ON A.CD_ATENDIMENTO = A2.CD_ATENDIMENTO_PAI
             WHERE
@@ -121,28 +127,30 @@ def DB(db_mv):
             -- Bloco 4: Pacientes de Pronto Socorro (tp_atendimento = 'U')
             SELECT DISTINCT 
                 '40085' AS "ID_Cliente_Hfocus",
-                A.HR_ATENDIMENTO AS "Data_Base",
+                A.HR_ATENDIMENTO AS "data_atendimento",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
+                PR.NM_PRESTADOR AS "medico",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'PRONTO_SOCORRO_GERAL' AS "area_pesquisa",
-                :hospital AS "Segmentacao_1",
+                :hospital AS "unidade",
                 CASE
                     WHEN A.CD_SERVICO = 1 THEN 'PA_OBSTÉTRICO'
                     WHEN A.CD_SERVICO = 27 THEN 'PA_PEDIATRICO'
                     ELSE 'PA_ADULTO'
-                END AS "Segmentacao_2"
+                END AS "setor"
             FROM
                 DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE
                 A.TP_ATENDIMENTO = 'U'
                 AND A.CD_TIP_RES NOT IN (1, 4, 11)
                 AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
             
             ORDER BY
-                "Segmentacao_2", "Segmentacao_1"
+                "setor", "unidade"
 
         """
         cursor.execute(SQL, {'hospital': hospital, 'data': data})
@@ -150,7 +158,7 @@ def DB(db_mv):
         rows      = cursor.fetchall()
         columns   = [desc[0] for desc in cursor.description]
         df        = pd.DataFrame(rows, columns=columns)
-        df["Data_Base"] = pd.to_datetime(df["Data_Base"]).dt.strftime("%Y-%m-%d %H:%M:%S")
+        df["data_atendimento"] = pd.to_datetime(df["data_atendimento"]).dt.strftime("%Y-%m-%d %H:%M:%S")
         dict_data = df.to_dict(orient='records')
 
         return dict_data

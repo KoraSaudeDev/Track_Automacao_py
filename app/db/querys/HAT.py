@@ -5,13 +5,13 @@ from app.service.calc_d1 import get_filtered_dates
 from app.db import db
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
-def DB(hospital = None):
+def DB():
     try:
-        conn     = db.get_connection("HA")
+        conn     = db.get_connection("HAT")
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
-        #data     = '2024-05-11 18:11:00.000'
+        data     = '2024-05-11 18:11:00.000'
         SQL = """
                 SELECT ID_FOCUS, "data_atendimento", "name", "email", "phone","cpf", "area_pesquisa", "setor","unidade", "especialidade"
                       ,"SEGMENTACAO 3", "SEGMENTACAO 4", "SEGMENTACAO 5", EXTRA_INF_SETOR, "medico", "ID_EXTERNO_PACIENTE", CD_ATENDIMENTO

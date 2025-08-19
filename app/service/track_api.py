@@ -80,8 +80,8 @@ def postImportLines(survey_uuid,import_lines):
    }
    try:
        response = requests.request("POST",url=url,headers=headers,json=data)
-       print("Cliente selecionado "+str(datetime.now()))
+       logging.info("Cliente selecionado "+str(datetime.now()))
        return response.json()
    except Exception as e:
-       print(f"Erro na API: {e}")
+       logging.error(f"Erro na API: {e}")
        return   

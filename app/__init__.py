@@ -20,7 +20,7 @@ automations.start('HMSM')
 automations.start('HSL')
 automations.start('HSF')
 automations.start('OTO_ING')
-automations.start('HA')
+automations.start('HAT')
 
 def create_app():
     app = Flask(__name__)

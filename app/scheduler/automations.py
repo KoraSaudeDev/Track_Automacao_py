@@ -2,20 +2,33 @@ import logging
 from datetime import datetime
 from app.scheduler import schedulers
 from app.db.querys import ESDB,ING_OTO,HAT
+from app.db.querys.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
 
 def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=None, uuid_ps=None,uuid_onc=None):
     
-    if hospital in ['HMS', 'HMC', 'HPC', 'HMV', 'HSF', 'HSL', 'HMSM']:
-        dbHospital = ESDB
+    if hospital in 'HMS':
+        dbHospital = HMS
+    elif hospital == 'HMC':
+        dbHospital = HMC
+    elif hospital == 'HPC':
+        dbHospital = HPC
+    elif hospital == 'HMV':
+        dbHospital = HMV
+    elif hospital == 'HSF':
+        dbHospital = HSF
+    elif hospital == 'HSL':
+        dbHospital = HMSM
+    elif hospital == 'HMSM':
+        dbHospital = HSL
     elif hospital == 'OTO_ING':
         dbHospital = ING_OTO
-    elif hospital == 'HA':
+    elif hospital == 'HAT':
         dbHospital = HAT
 
-    data_list = dbHospital.DB(hospital)
+    data_list = dbHospital.DB()
     internacao = []
     exames = []
     maternidade = []   

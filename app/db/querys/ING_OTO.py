@@ -11,7 +11,7 @@ def DB(hospital = None):
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
-        #data     = '2024-05-11 18:11:00.000'
+        data     = '2024-05-11 18:11:00.000'
         SQL = """
             -- Bloco 1: Pacientes do Pronto Socorro (Urgência)
             SELECT

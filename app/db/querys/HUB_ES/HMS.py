@@ -5,31 +5,17 @@ from app.service.calc_d1 import get_filtered_dates
 from app.db import db
 
 
-def DB(db_mv):
-    if db_mv == 'HMS':
-        hospital = 'Meridional Serra'
-    elif db_mv == 'HMC':
-        hospital = 'Meridional Cariacica'   
-    elif db_mv == 'HPC':
-        hospital = 'Meridional Praia Da Costa'
-    elif db_mv == 'HMV':
-        hospital = 'Meridional Vitória'
-    elif db_mv == 'HSF':
-        hospital = 'Hospital São Francisco'
-    elif db_mv == 'HSL':
-        hospital = 'Hospital São Luiz'
-    elif db_mv == 'HMSM':
-        hospital = 'Hospital São Mateus'
+def DB():
 
     try:
-        conn     = db.get_connection(db_mv)
+        conn     = db.get_connection('HMS')
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
-        data     = '2024-05-10 18:11:00.000'
+        #data     = '2024-05-10 18:11:00.000'
         #data     = '2013-04-29 00:00:00.000'
         SQL = """
-            -- Bloco 1: Pacientes de Ambulatório, Oncologia e Hospital Dia (tp_atendimento = 'A')
+                        -- Bloco 1: Pacientes de Ambulatório, Oncologia e Hospital Dia (tp_atendimento = 'A')
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 A.HR_ATENDIMENTO AS "data_atendimento",
@@ -43,7 +29,7 @@ def DB(db_mv):
                     WHEN A.CD_ORI_ATE = 9 THEN 'HOSPITAL_DIA'
                     ELSE 'AMBULATORIO'
                 END AS "area_pesquisa",
-                :hospital AS "unidade",
+                'Meridional Serra' AS "unidade",
                 CASE
                     WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
                     WHEN A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
@@ -71,7 +57,7 @@ def DB(db_mv):
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'EXAMES' AS "area_pesquisa",
-                :hospital AS "unidade",
+                'Meridional Serra' AS "unidade",
                 CASE
                     WHEN A.CD_ORI_ATE = 46 THEN 'HEMODINAMICA'
                     WHEN A.CD_ORI_ATE = 7 THEN 'LABORATORIO'
@@ -100,7 +86,7 @@ def DB(db_mv):
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
                 END AS "area_pesquisa",
-                :hospital AS "unidade",
+                'Meridional Serra' AS "unidade",
                 CASE
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
@@ -134,7 +120,7 @@ def DB(db_mv):
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'PRONTO_SOCORRO_GERAL' AS "area_pesquisa",
-                :hospital AS "unidade",
+                'Meridional Serra' AS "unidade",
                 CASE
                     WHEN A.CD_SERVICO = 1 THEN 'PA_OBSTÉTRICO'
                     WHEN A.CD_SERVICO = 27 THEN 'PA_PEDIATRICO'
@@ -151,9 +137,8 @@ def DB(db_mv):
             
             ORDER BY
                 "setor", "unidade"
-
         """
-        cursor.execute(SQL, {'hospital': hospital, 'data': data})
+        cursor.execute(SQL, {'data': data})
 
         rows      = cursor.fetchall()
         columns   = [desc[0] for desc in cursor.description]

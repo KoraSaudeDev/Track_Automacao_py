@@ -7,19 +7,19 @@ from app.db import db
 
 def DB(db_mv):
     if db_mv == 'HMS':
-        hospital = 'MERIDIONAL_SERRA'
+        hospital = 'Meridional Serra'
     elif db_mv == 'HMC':
-        hospital = 'MERIDIONAL_CARIACICA'   
+        hospital = 'Meridional Cariacica'   
     elif db_mv == 'HPC':
-        hospital = 'MERIDIONAL_PRAIA_DA_COSTA'
+        hospital = 'Meridional Praia Da Costa'
     elif db_mv == 'HMV':
-        hospital = 'MERIDIONAL_VITORIA'
+        hospital = 'Meridional Vitória'
     elif db_mv == 'HSF':
-        hospital = 'HOSPITAL_SÃO_FRANCISCO'
+        hospital = 'Hospital São Francisco'
     elif db_mv == 'HSL':
-        hospital = 'HOSPITAL_SÃO_LUIZ'
+        hospital = 'Hospital São Luiz'
     elif db_mv == 'HMSM':
-        hospital = 'HOSPITAL_SÃO_MATEUS'
+        hospital = 'Hospital São Mateus'
 
     try:
         conn     = db.get_connection(db_mv)

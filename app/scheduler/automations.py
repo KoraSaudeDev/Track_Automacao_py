@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from app.scheduler import schedulers
-from app.db.querys import ESDB,ING_OTO
+from app.db.querys import ESDB,ING_OTO,HAT
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
@@ -10,8 +10,10 @@ def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=
     
     if hospital in ['HMS', 'HMC', 'HPC', 'HMV', 'HSF', 'HSL', 'HMSM']:
         dbHospital = ESDB
-    else:
+    elif hospital == 'OTO_ING':
         dbHospital = ING_OTO
+    elif hospital == 'HA':
+        dbHospital = HAT
 
     data_list = dbHospital.DB(hospital)
     internacao = []

@@ -6,7 +6,9 @@ track_bp = Blueprint("track_bp",__name__)
 
 @track_bp.route('/')
 def hello():
-    return "A aplicação está rodando....."
+    with open("system.log", "r") as f:
+        log_content = f.read()
+    return f"<pre>{log_content}</pre>"
 
 
 #@track_bp.route('/teste')

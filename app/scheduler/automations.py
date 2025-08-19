@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from app.scheduler import schedulers
-from app.db.querys import ESDB,ING_OTO,HAT
+from app.db.querys import ING_OTO,HAT
 from app.db.querys.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
 
 logging.basicConfig(level=logging.INFO,filename="system.log")

@@ -19,23 +19,25 @@ def DB():
 
             -- Bloco 1: Pronto Socorro
             SELECT
-                '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento", p.nm_paciente AS "name",
+                '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento", p.nm_paciente AS "name",PR.NM_PRESTADOR AS "medico",
                 p.email AS "email", (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'PRONTO_SOCORRO_GERAL' AS "area_pesquisa", 'Hospital São Francisco' AS "unidade",
                 CASE WHEN a.cd_servico = 40 THEN 'PA_PEDIATRICO' ELSE 'PA_ADULTO' END AS "setor"
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE a.tp_atendimento = 'U' AND a.cd_tip_res NOT IN (6, 17, 21) AND a.cd_servico IN (23, 37, 40) AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
 
             UNION ALL
 
             -- Bloco 2: Maternidade
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'MATERNIDADE', 'Hospital São Francisco', 'MATERNIDADE'
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             INNER JOIN dbamv.atendime a2 ON a.cd_atendimento = a2.cd_atendimento_pai
             WHERE a.tp_atendimento = 'I' AND a.cd_mot_alt NOT IN (11, 12, 13, 49, 50, 51) AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
 
@@ -43,11 +45,12 @@ def DB():
 
             -- Bloco 3: Internação Geral
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'INTERNACAO', 'Hospital São Francisco', 'INTERNACAO'
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE a.tp_atendimento = 'I'
             AND a.cd_cid NOT IN ('O60','O80','O82','O84','O757','O800','O801','O809','O810','O820','O821','O822','O829','O839','O840','O842','Z380','Z382')
             AND a.cd_mot_alt NOT IN (11, 12, 13, 49, 50, 51) AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
@@ -56,23 +59,25 @@ def DB():
 
             -- Bloco 4: Hospital Dia e Ambulatório
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'HOSPITAL_DIA', 'Hospital São Francisco', 'INTERNACAO'
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE a.tp_atendimento = 'E' AND a.cd_ori_ate = 15 AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
 
             UNION ALL
 
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'AMBULATORIO', 'Hospital São Francisco',
                 CASE WHEN s.cd_ser_dis in (30, 33, 46) THEN s.ds_ser_dis ELSE 'GERAL_AMBULATORIO' END
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN dbamv.ser_dis s ON a.cd_ser_dis = s.cd_ser_dis
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE a.tp_atendimento = 'A' AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
         """
         cursor.execute(SQL, {'data': data})

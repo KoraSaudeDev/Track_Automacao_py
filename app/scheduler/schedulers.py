@@ -10,8 +10,8 @@ scheduler = BackgroundScheduler()
 def send_email(data, survey_uuid):
     track_api.postDistribution(survey_uuid, "email", data)
 
-def send_wpp(data, survey_uuid):
-    track_api.postDistributionWhatsapp(survey_uuid, "whatsapp", data)
+#def send_wpp(data, survey_uuid):
+#    track_api.postDistributionWhatsapp(survey_uuid, "whatsapp", data)
 
 def send_teste(data, survey_uuid):
     track_api.postImportLines(survey_uuid,data)

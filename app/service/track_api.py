@@ -2,24 +2,12 @@ import os
 import requests
 import logging
 from datetime import datetime
+from app.service.calc_d1 import get_dates_reminder
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
 url_api = "https://api.track.co"
 ORGANIZATION_UUID = os.getenv("ORGANIZATION_UUID")
 API_TOKEN = os.getenv("API_TOKEN")
-
-def getSurveys():
-    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/surveys"
-    headers = {
-        "Authorization": f"Bearer {API_TOKEN}"
-    }
-    try:
-        response = requests.request("GET",url,headers=headers)
-        logging.info(f"[{datetime.now()}] Consulta na API realizada ")
-        return response.json()
-    except Exception as e:
-        logging.error(f"[{datetime.now()}] Erro na API: {e}")
-        return 
 
 def postDistribution(survey_uuid,distribution_channel,import_lines):
     url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"
@@ -29,7 +17,16 @@ def postDistribution(survey_uuid,distribution_channel,import_lines):
     data = {
         "survey_uuid":survey_uuid,
         "distribution_channel":distribution_channel,
-        "import_lines":import_lines     
+        "reminder":'whatsapp',
+        "reminder_at":get_dates_reminder(7),
+        "import_lines":import_lines,   
+        "whatsapp_reminder_template": {
+            "name": "nome do template",
+            "language": "idioma do template",
+            "variables": ["customer.name"] 
+            },
+        "whatsapp_integration_uuid": "a726be1e-7be0-4add-b983-9c0e46a693db"
+ 
     }
     
     try:

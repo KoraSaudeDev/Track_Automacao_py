@@ -20,9 +20,9 @@ def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=
     elif hospital == 'HSF':
         dbHospital = HSF
     elif hospital == 'HSL':
-        dbHospital = HMSM
-    elif hospital == 'HMSM':
         dbHospital = HSL
+    elif hospital == 'HMSM':
+        dbHospital = HMSM
     elif hospital == 'OTO_ING':
         dbHospital = ING_OTO
     elif hospital == 'HAT':

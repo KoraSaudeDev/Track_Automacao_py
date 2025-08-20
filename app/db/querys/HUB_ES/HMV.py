@@ -8,150 +8,151 @@ from app.db import db
 def DB():
 
     try:
-        conn     = db.get_connection('HMV')
+        conn     = db.get_connection('HMSM')
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
         #data     = '2024-05-10 18:11:00.000'
         #data     = '2013-04-29 00:00:00.000'
         SQL = """
+            --  Hospital Meridional Vitória 
+
+            -- Bloco 1: Pronto Socorro
             SELECT
-            '40085' AS "ID_Cliente_Hfocus",
-            a.hr_atendimento AS "Data_Base",
-            p.nm_paciente AS "Nome_Completo_Paciente",
-            p.email AS "E-mail",
-            p.nr_fone AS "Telefone_Residencial",
-            p.nr_celular AS "Telefone_Celular",
-            p.nr_cpf AS "CPF",
-            'PRONTO_SOCORRO_GERAL' AS "Area_Pesquisa",
-            'Meridional Vitória' AS "Segmentacao_1",
-            CASE
-                WHEN s.cd_servico IN (3, 4, 15, 23, 37, 38) THEN 'PA_ADULTO'
-                WHEN s.cd_servico IN (40, 41) THEN 'PA_PEDIATRICO'
-                WHEN s.cd_servico IN (5, 82) THEN 'PA_GINECOLOGICO'
-            END AS "Segmentacao_2"
-        FROM
-            dbamv.paciente p
-        JOIN
-            dbamv.atendime a ON p.cd_paciente = a.cd_paciente
-        JOIN
-            dbamv.servico s ON a.cd_servico = s.cd_servico
-        WHERE
-            a.tp_atendimento = 'U'
-            AND a.cd_tip_res NOT IN (6, 8)
-            AND a.cd_multi_empresa = '2'
-            AND s.cd_servico IN (3, 4, 15, 23, 37, 38, 40, 41, 5, 82)
-            AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+                '40085' AS "ID_Cliente_Hfocus",
+                a.hr_atendimento AS "data_atendimento",
+                p.nm_paciente AS "name",
+                p.email AS "email",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf",
+                PR.NM_PRESTADOR AS "medico",
+                'PRONTO_SOCORRO_GERAL' AS "area_pesquisa",
+                'Meridional Vitoria' AS "unidade",
+                CASE 
+                    WHEN s.cd_servico IN (40, 41) THEN 'PA_PEDIATRICO'
+                    WHEN s.cd_servico IN (5, 82) THEN 'PA_GINECOLOGICO'
+                    ELSE 'PA_ADULTO'
+                END AS "setor"
+            FROM
+                dbamv.paciente p
+            INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
+            INNER JOIN dbamv.servico s ON a.cd_servico = s.cd_servico
+            WHERE
+                a.tp_atendimento = 'U'
+                AND a.cd_tip_res NOT IN (6, 8)
+                AND a.cd_multi_empresa = '2'
+                AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
 
-        UNION ALL
+            UNION ALL
 
-        SELECT
-            '40085' AS "ID_Cliente_Hfocus",
-            CASE
-                WHEN a.dt_atendimento IS NOT NULL AND a.hr_atendimento IS NOT NULL THEN TO_CHAR(a.dt_atendimento, 'dd/mm/yyyy') || ' ' || TO_CHAR(a.hr_atendimento, 'hh24:mi:ss')
-                ELSE a.hr_atendimento
-            END AS "Data_Base",
-            p.nm_paciente AS "Nome_Completo_Paciente",
-            p.email AS "E-mail",
-            p.nr_fone AS "Telefone_Residencial",
-            p.nr_celular AS "Telefone_Celular",
-            p.nr_cpf AS "CPF",
-            'MATERNIDADE' AS "Area_Pesquisa",
-            'Meridional Vitória' AS "Segmentacao_1",
-            'MATERNIDADE' AS "Segmentacao_2"
-        FROM
-            dbamv.paciente p
-        JOIN
-            dbamv.atendime a ON p.cd_paciente = a.cd_paciente
-        JOIN
-            dbamv.atendime a2 ON a.CD_ATENDIMENTO = a2.CD_ATENDIMENTO_PAI
-        WHERE
-            a.tp_atendimento = 'I'
-            AND a.cd_mot_alt NOT IN ('11', '12', '13', '51')
-            AND a.cd_multi_empresa = '2'
-            AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+            -- Bloco 2: Maternidade
+            SELECT
+                '40085' AS "ID_Cliente_Hfocus",
+                a.hr_atendimento AS "data_atendimento",
+                p.nm_paciente AS "name",
+                p.email AS "email",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf",
+                PR.NM_PRESTADOR AS "medico",
+                'MATERNIDADE' AS "area_pesquisa",
+                'Meridional Vitoria' AS "unidade",
+                'MATERNIDADE' AS "setor"
+            FROM
+                dbamv.paciente p
+            INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
+            INNER JOIN dbamv.atendime a2 ON a.cd_atendimento = a2.cd_atendimento_pai
+            WHERE
+                a.tp_atendimento = 'I'
+                AND a.cd_mot_alt NOT IN (11, 12, 13, 51)
+                AND a.cd_multi_empresa = '2'
+                AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
 
-        UNION ALL
+            UNION ALL
 
-        SELECT
-            '40085' AS "ID_Cliente_Hfocus",
-            a.hr_atendimento AS "Data_Base",
-            p.nm_paciente AS "Nome_Completo_Paciente",
-            p.email AS "E-mail",
-            p.nr_fone AS "Telefone_Residencial",
-            p.nr_celular AS "Telefone_Celular",
-            p.nr_cpf AS "CPF",
-            'INTERNACAO' AS "Area_Pesquisa",
-            'Meridional Vitória' AS "Segmentacao_1",
-            'INTERNACAO' AS "Segmentacao_2"
-        FROM
-            dbamv.paciente p
-        JOIN
-            dbamv.atendime a ON p.cd_paciente = a.cd_paciente
-        WHERE
-            a.tp_atendimento = 'I'
-            AND a.CD_CID NOT IN ('O60', 'O80', 'O82', 'O84', 'O757', 'O800', 'O801', 'O809', 'O810', 'O820', 'O821', 'O822', 'O829', 'O839', 'O840', 'O842', 'Z380', 'Z382')
-            AND a.cd_mot_alt NOT IN ('11', '12', '13', '51')
-            AND a.cd_multi_empresa = '2'
-            AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+            -- Bloco 3: Internação Geral
+            SELECT
+                '40085' AS "ID_Cliente_Hfocus",
+                a.hr_atendimento AS "data_atendimento",
+                p.nm_paciente AS "name",
+                p.email AS "email",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf",
+                PR.NM_PRESTADOR AS "medico",
+                'INTERNACAO' AS "area_pesquisa",
+                'Meridional Vitoria' AS "unidade",
+                'INTERNACAO' AS "setor"
+            FROM
+                dbamv.paciente p
+            INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
+            WHERE
+                a.tp_atendimento = 'I'
+                AND a.cd_cid NOT IN ('O60','O80','O82','O84','O757','O800','O801','O809','O810','O820','O821','O822','O829','O839','O840','O842','Z380','Z382')
+                AND a.cd_mot_alt NOT IN (11, 12, 13, 51)
+                AND a.cd_multi_empresa = '2'
+                AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) -- Corrigido de dt_atendimento para dt_alta para consistência com internação
 
-        UNION ALL
+            UNION ALL
 
-        SELECT
-            '40085' AS "ID_Cliente_Hfocus",
-            a.hr_atendimento AS "Data_Base",
-            p.nm_paciente AS "Nome_Completo_Paciente",
-            p.email AS "E-mail",
-            p.nr_fone AS "Telefone_Residencial",
-            p.nr_celular AS "Telefone_Celular",
-            p.nr_cpf AS "CPF",
-            'EXAMES' AS "Area_Pesquisa",
-            'Meridional Vitória' AS "Segmentacao_1",
-            CASE
-                WHEN a.cd_ori_ate = 0 THEN 'HEMODINAMICA'
-                WHEN a.cd_ori_ate = 15 THEN 'LABORATORIO'
-            END AS "Segmentacao_2"
-        FROM
-            dbamv.paciente p
-        JOIN
-            dbamv.atendime a ON p.cd_paciente = a.cd_paciente
-        WHERE
-            a.tp_atendimento = 'E'
-            AND a.cd_ori_ate IN (0, 15)
-            AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-            
-        UNION ALL
+            -- Bloco 4: Exames
+            SELECT
+                '40085' AS "ID_Cliente_Hfocus",
+                a.hr_atendimento AS "data_atendimento",
+                p.nm_paciente AS "name",
+                p.email AS "email",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf",
+                PR.NM_PRESTADOR AS "medico",
+                'EXAMES' AS "area_pesquisa",
+                'Meridional Vitoria' AS "unidade",
+                CASE
+                    WHEN a.cd_ori_ate = 0 THEN 'HEMODINAMICA'
+                    WHEN a.cd_ori_ate = 15 THEN 'LABORATORIO'
+                END AS "setor"
+            FROM
+                dbamv.paciente p
+            INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
+            WHERE
+                a.tp_atendimento = 'E'
+                AND a.cd_ori_ate IN (0, 15)
+                AND a.cd_multi_empresa = '2' -- Adicionado para consistência
+                AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
 
-        SELECT
-            '40085' AS ID_CLIENTE_HFOCUS,
-            A.HR_ATENDIMENTO AS DATA_BASE,
-            P.NM_PACIENTE AS NOME_COMPLETO_PACIENTE,
-            P.EMAIL AS EMAIL,
-            P.NR_FONE AS TELEFONE_RESIDENCIAL,
-            P.NR_CELULAR AS TELEFONE_CELULAR,
-            P.NR_CPF AS CPF,
-            OA.DS_ORI_ATE AS AREA_PESQUISA,
-            'Meridional Vitória' AS SEGMENTACAO_1,
-            CASE
-                WHEN e.CD_ESPECIALID IN (9, 28, 22, 33) AND e.CD_ESPECIALID <> 28 THEN e.DS_ESPECIALID
-                WHEN e.CD_ESPECIALID = 28 AND OA.CD_ORI_ATE = 29 THEN OA.DS_ORI_ATE
-                ELSE OA.DS_ORI_ATE
-            END AS SEGMENTACAO_2
-        FROM
-            dbamv.paciente p
-        JOIN
-            dbamv.atendime a ON p.cd_paciente = a.cd_paciente
-        JOIN
-            dbamv.ori_ate oa ON oa.CD_ORI_ATE = a.CD_ORI_ATE
-        LEFT JOIN
-            dbamv.especialid e ON e.CD_ESPECIALID = a.CD_ESPECIALID
-        WHERE
-            oa.CD_ORI_ATE IN (30, 29)
-            AND oa.TP_ORIGEM = 'A'
-            AND oa.CD_MULTI_EMPRESA = 2
-            AND TRUNC(a.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+            UNION ALL
 
-        ORDER BY 9, 10, 8;
+            -- Bloco 5: Ambulatório e Oncologia
+            SELECT
+                '40085' AS "ID_Cliente_Hfocus",
+                a.hr_atendimento AS "data_atendimento",
+                p.nm_paciente AS "name",
+                p.email AS "email",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf",
+                PR.NM_PRESTADOR AS "medico",
+                oa.ds_ori_ate AS "area_pesquisa", -- Define a área dinamicamente (Ambulatório/Oncologia)
+                'Meridional Vitoria' AS "unidade",
+                (SELECT -- Sub-select para definir o setor com base na especialidade
+                    CASE 
+                        WHEN e.cd_especialid NOT IN (9, 28, 22, 33) THEN oa.ds_ori_ate
+                        WHEN e.cd_especialid = 28 AND oa.cd_ori_ate = 29 THEN oa.ds_ori_ate
+                        ELSE e.ds_especialid
+                    END 
+                FROM dbamv.especialid e 
+                WHERE e.cd_especialid = a.cd_especialid
+                ) AS "setor"
+            FROM
+                dbamv.paciente p
+            INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
+            INNER JOIN dbamv.ori_ate oa ON oa.cd_ori_ate = a.cd_ori_ate
+            WHERE
+                oa.tp_origem = 'A'
+                AND oa.cd_multi_empresa = 2
+                AND oa.cd_ori_ate IN (30, 29) -- 30=AMBULATORIO, 29=ONCOLOGIA
+                AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
         """
         cursor.execute(SQL, {'data': data})
 

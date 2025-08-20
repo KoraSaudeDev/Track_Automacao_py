@@ -11,7 +11,6 @@ def DB():
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
-        data     = '2024-05-11 18:11:00.000'
         SQL = """
                 SELECT ID_FOCUS, "data_atendimento", "name", "email", "phone","cpf", "area_pesquisa", "setor","unidade", "especialidade"
                       ,"SEGMENTACAO 3", "SEGMENTACAO 4", "SEGMENTACAO 5", EXTRA_INF_SETOR, "medico", "ID_EXTERNO_PACIENTE", CD_ATENDIMENTO

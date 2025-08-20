@@ -31,8 +31,8 @@ def start_schedulers(data):
 
     #print(data[0])
     
-    logging.warning(f"[{datetime.now()}] - {data[0]['unidade']} - {data[0]['setor']}  - Disparo agendado!")
-    print(f"{data[0]['unidade']} - {data[0]['setor']} -  schedulers iniciado")
+    logging.warning(f"[{datetime.now()}] - {data[0]['unidade']} - {data[0]['area_pesquisa']}  - Disparo agendado!")
+    print(f"{data[0]['unidade']} - {data[0]['area_pesquisa']} -  schedulers iniciado")
     if not scheduler.running:
         scheduler.start()
     else:

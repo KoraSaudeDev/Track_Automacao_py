@@ -12,8 +12,7 @@ def DB():
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
-        #data     = '2024-05-10 18:11:00.000'
-        #data     = '2013-04-29 00:00:00.000'
+
         SQL = """
             -- Hospital São Francisco
 

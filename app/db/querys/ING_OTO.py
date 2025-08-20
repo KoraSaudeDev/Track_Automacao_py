@@ -11,7 +11,6 @@ def DB(hospital = None):
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
-        data     = '2024-05-11 18:11:00.000'
         SQL = """
             -- Bloco 1: Pacientes do Pronto Socorro (Urgência)
             SELECT
@@ -22,7 +21,12 @@ def DB(hospital = None):
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'PRONTO_SOCORRO_GERAL' AS "area_pesquisa",
-                M.DS_MULTI_EMPRESA AS "unidade",
+                CASE
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' THEN 'Hospital Oto Santos Dumont'
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' THEN 'Hospital Oto Aldeota'
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' THEN 'Hospital Oto Meireles'
+                	ELSE M.DS_RAZAO_SOCIAL 
+                END AS "unidade",
                 CASE 
                     WHEN A.CD_SERVICO = 5 THEN 'PA_OBSTÉTRICO'
                     WHEN A.CD_SERVICO = 40 THEN 'PA_PEDIATRICO'
@@ -52,7 +56,12 @@ def DB(hospital = None):
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
                 END AS "area_pesquisa",
-                M.DS_MULTI_EMPRESA AS "unidade",
+                CASE
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' THEN 'Hospital Oto Santos Dumont'
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' THEN 'Hospital Oto Aldeota'
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' THEN 'Hospital Oto Meireles'
+                	ELSE M.DS_RAZAO_SOCIAL 
+                END AS "unidade",
                 CASE
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
@@ -84,7 +93,12 @@ def DB(hospital = None):
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'EXAMES' AS "area_pesquisa",
-                M.DS_MULTI_EMPRESA AS "unidade",
+                CASE
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' THEN 'Hospital Oto Santos Dumont'
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' THEN 'Hospital Oto Aldeota'
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' THEN 'Hospital Oto Meireles'
+                	ELSE M.DS_RAZAO_SOCIAL 
+                END AS "unidade",
                 CASE
                     WHEN A.CD_ORI_ATE = 103 THEN 'HEMODINAMICA'
                     WHEN A.CD_ORI_ATE IN (47, 22, 104, 106, 109) THEN 'IMAGEM'
@@ -110,7 +124,12 @@ def DB(hospital = None):
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'AMBULATORIO' AS "area_pesquisa",
-                M.DS_MULTI_EMPRESA AS "unidade",
+                CASE
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' THEN 'Hospital Oto Santos Dumont'
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' THEN 'Hospital Oto Aldeota'
+                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' THEN 'Hospital Oto Meireles'
+                	ELSE M.DS_RAZAO_SOCIAL 
+                END AS "unidade",
                 CASE
                     WHEN A.CD_SER_DIS IN (9, 15, 30, 31, 33, 46) THEN S.DS_SER_DIS
                     ELSE 'AMBULATORIO_GERAL'

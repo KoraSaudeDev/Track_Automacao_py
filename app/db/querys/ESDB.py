@@ -26,7 +26,6 @@ def DB(db_mv):
         cursor   = conn.cursor()
 
         data     = get_filtered_dates()[0]
-        data     = '2024-05-10 18:11:00.000'
         #data     = '2013-04-29 00:00:00.000'
         SQL = """
             -- Bloco 1: Pacientes de Ambulatório, Oncologia e Hospital Dia (tp_atendimento = 'A')

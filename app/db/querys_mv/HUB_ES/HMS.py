@@ -122,7 +122,7 @@ def DB():
                 PR.NM_PRESTADOR AS "medico",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
-                'PRONTO_SOCORRO_GERAL' AS "area_pesquisa",
+                'PRONTO SOCORRO GERAL' AS "area_pesquisa",
                 'Meridional Serra' AS "unidade",
                 CASE
                     WHEN A.CD_SERVICO = 1 THEN 'PA_OBSTÉTRICO'
@@ -146,6 +146,7 @@ def DB():
         rows      = cursor.fetchall()
         columns   = [desc[0] for desc in cursor.description]
         df        = pd.DataFrame(rows, columns=columns)
+        df["data_saida_alta"] = pd.to_datetime(df["data_saida_alta"]).dt.strftime("%Y-%m-%d %H:%M:%S")
         df["data_atendimento"] = pd.to_datetime(df["data_atendimento"]).dt.strftime("%Y-%m-%d %H:%M:%S")
         dict_data = df.to_dict(orient='records')
 

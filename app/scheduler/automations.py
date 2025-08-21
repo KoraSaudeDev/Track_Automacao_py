@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
 from app.scheduler import schedulers
-from app.db.querys import ING_OTO,HAT
-from app.db.querys.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
+from app.db.querys_mv import ING_OTO,HAT
+from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
@@ -48,7 +48,7 @@ def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=
             internacao.append({**data, "uuid": uuid_int})
         elif data["area_pesquisa"] == "MATERNIDADE":
             maternidade.append({**data, "uuid": uuid_mat})    
-        elif data["area_pesquisa"] == "PRONTO_SOCORRO_GERAL":
+        elif data["area_pesquisa"] == "PRONTO SOCORRO GERAL":
             pronto_socorro.append({**data, "uuid": uuid_ps})
         elif data["area_pesquisa"] == "ONCOLOGIA":
            oncologia.append({**data, "uuid": uuid_onc})
@@ -64,7 +64,6 @@ def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=
 
 def start(hospital):
 
-    print("Iniciando automações...")
     data = data_search(hospital=hospital,
                       uuid_amb='913ef30e-6e75-45b6-acdd-eb78e1bb4626', 
                       uuid_exa='ed7bd007-0dd9-4b0d-9e08-c0dbf2cdfb3c', 

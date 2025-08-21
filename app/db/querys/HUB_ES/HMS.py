@@ -14,10 +14,11 @@ def DB():
         data     = get_filtered_dates()[0]
 
         SQL = """
-                        -- Bloco 1: Pacientes de Ambulatório, Oncologia e Hospital Dia (tp_atendimento = 'A')
+            -- Bloco 1: Pacientes de Ambulatório, Oncologia e Hospital Dia (tp_atendimento = 'A')
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 A.HR_ATENDIMENTO AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
                 PR.NM_PRESTADOR AS "medico",
@@ -50,6 +51,7 @@ def DB():
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 A.HR_ATENDIMENTO AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
                 PR.NM_PRESTADOR AS "medico",
@@ -76,6 +78,7 @@ def DB():
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 A.HR_ATENDIMENTO AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
                 PR.NM_PRESTADOR AS "medico",
@@ -113,6 +116,7 @@ def DB():
             SELECT DISTINCT 
                 '40085' AS "ID_Cliente_Hfocus",
                 A.HR_ATENDIMENTO AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
                 PR.NM_PRESTADOR AS "medico",

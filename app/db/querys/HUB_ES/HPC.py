@@ -18,7 +18,7 @@ def DB():
 
             -- Bloco 1: Pronto Socorro
             SELECT
-                '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento", p.nm_paciente AS "name",PR.NM_PRESTADOR AS "medico",
+                '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name",PR.NM_PRESTADOR AS "medico",
                 p.email AS "email", (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'PRONTO_SOCORRO_GERAL' AS "area_pesquisa", 'Meridional Praia Da Costa' AS "unidade",
                 CASE WHEN a.cd_servico IN (3) THEN 'PA_PEDIATRICO' WHEN a.cd_servico IN (2) THEN 'PA_OBSTETRICO' ELSE 'PA_ADULTO' END AS "setor"
@@ -31,7 +31,7 @@ def DB():
 
             -- Bloco 2: Maternidade
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'MATERNIDADE', 'Meridional Praia Da Costa', 'MATERNIDADE'
             FROM dbamv.paciente p
@@ -44,7 +44,7 @@ def DB():
 
             -- Bloco 3: Internação Geral
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'INTERNACAO', 'Meridional Praia Da Costa', 'INTERNACAO'
             FROM dbamv.paciente p
@@ -58,7 +58,7 @@ def DB():
 
             -- Bloco 4: Hospital Dia e Ambulatório
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'HOSPITAL_DIA', 'Meridional Praia Da Costa', 'INTERNACAO'
             FROM dbamv.paciente p
@@ -69,7 +69,7 @@ def DB():
             UNION ALL
 
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'AMBULATORIO', 'Meridional Praia Da Costa',
                 CASE WHEN a.cd_ser_dis IN (6, 14, 17, 20) THEN s.ds_ser_dis ELSE 'GERAL_AMBULATORIO' END
@@ -83,7 +83,7 @@ def DB():
 
             -- Bloco 5: Exames
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'EXAMES', 'Meridional Praia Da Costa',
                 CASE WHEN a.cd_ori_ate IN (2, 15) THEN 'IMAGEM' WHEN a.cd_ori_ate = 20 THEN 'LABORATORIO' END
@@ -96,7 +96,7 @@ def DB():
 
             -- Bloco 6: Oncologia
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 p.nr_cpf, 'ONCOLOGIA', 'Meridional Praia Da Costa', 'ONCOLOGIA'
             FROM dbamv.paciente p

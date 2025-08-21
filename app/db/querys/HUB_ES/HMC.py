@@ -17,7 +17,7 @@ def DB():
             -- Hospital Meridional Cariacica
             -- Bloco 1: Pronto Socorro
             SELECT
-                '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento", p.nm_paciente AS "name",PR.NM_PRESTADOR AS "medico",
+                '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name",PR.NM_PRESTADOR AS "medico",
                 p.email AS "email", (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'PRONTO_SOCORRO_GERAL' AS "area_pesquisa", 'Meridional Cariacica' AS "unidade",
                 CASE WHEN a.cd_servico = 40 THEN 'PA_PEDIATRICO' ELSE 'PA_ADULTO' END AS "setor"
@@ -30,7 +30,7 @@ def DB():
 
             -- Bloco 2: Maternidade
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 PR.NM_PRESTADOR AS "medico",
                 p.nr_cpf, 'MATERNIDADE', 'Meridional Cariacica', 'MATERNIDADE'
@@ -44,7 +44,7 @@ def DB():
 
             -- Bloco 3: Internação Geral
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 PR.NM_PRESTADOR AS "medico",
                 p.nr_cpf, 'INTERNACAO', 'Meridional Cariacica', 'INTERNACAO'
@@ -59,7 +59,7 @@ def DB():
 
             -- Bloco 4: Hospital Dia e Ambulatório
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 PR.NM_PRESTADOR AS "medico",
                 p.nr_cpf, 'HOSPITAL_DIA', 'Meridional Cariacica', 'INTERNACAO'
@@ -71,7 +71,7 @@ def DB():
             UNION ALL
 
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 PR.NM_PRESTADOR AS "medico",
                 p.nr_cpf, 'AMBULATORIO', 'Meridional Cariacica',
@@ -86,7 +86,7 @@ def DB():
 
             -- Bloco 5: Exames (Hiperbárica)
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 PR.NM_PRESTADOR AS "medico",
                 p.nr_cpf, 'EXAMES', 'Meridional Cariacica', 'HIPERBARICA'
@@ -99,7 +99,7 @@ def DB():
 
             -- Bloco 6: Oncologia
             SELECT
-                '40085', a.hr_atendimento, p.nm_paciente, p.email AS "email",
+                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 PR.NM_PRESTADOR AS "medico",
                 p.nr_cpf, 'ONCOLOGIA', 'Meridional Cariacica', 'ONCOLOGIA'

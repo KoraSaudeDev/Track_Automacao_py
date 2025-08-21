@@ -20,6 +20,7 @@ def DB():
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 a.hr_atendimento AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 p.nm_paciente AS "name",
                 p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
@@ -49,6 +50,7 @@ def DB():
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 a.hr_atendimento AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 p.nm_paciente AS "name",
                 p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
@@ -74,6 +76,7 @@ def DB():
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 a.hr_atendimento AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 p.nm_paciente AS "name",
                 p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
@@ -99,6 +102,7 @@ def DB():
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 a.hr_atendimento AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 p.nm_paciente AS "name",
                 p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
@@ -126,6 +130,7 @@ def DB():
             SELECT
                 '40085' AS "ID_Cliente_Hfocus",
                 a.hr_atendimento AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 p.nm_paciente AS "name",
                 p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",

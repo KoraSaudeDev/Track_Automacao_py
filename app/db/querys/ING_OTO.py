@@ -16,6 +16,7 @@ def DB(hospital = None):
             SELECT
                 '40085' AS "ID_CLIENTE_HFOCUS",
                 A.HR_ATENDIMENTO AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
@@ -48,6 +49,7 @@ def DB(hospital = None):
             SELECT
                 '40085' AS "ID_CLIENTE_HFOCUS",
                 A.HR_ATENDIMENTO AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
@@ -88,6 +90,7 @@ def DB(hospital = None):
             SELECT
                 '40085' AS "ID_CLIENTE_HFOCUS",
                 A.HR_ATENDIMENTO AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
@@ -119,6 +122,7 @@ def DB(hospital = None):
             SELECT
                 '40085' AS "ID_CLIENTE_HFOCUS",
                 A.HR_ATENDIMENTO AS "data_atendimento",
+                A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",

@@ -18,6 +18,7 @@ def postDistribution(survey_uuid,distribution_channel,import_lines):
         "survey_uuid":survey_uuid,
         "distribution_channel":distribution_channel,
         "reminder":'whatsapp',
+        "validity_at":get_dates_reminder(14),
         "reminder_at":get_dates_reminder(7),
         "import_lines":import_lines,   
         "whatsapp_reminder_template": {

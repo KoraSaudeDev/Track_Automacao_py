@@ -22,14 +22,14 @@ def schedule_task(task_func):
     
 def start_schedulers(data):
     if(data == None or len(data) == 0):
-        logging.warning(f"[{datetime.now()}] - {data} - sem dados")
+        logging.warning(f"[{datetime.now()}] - sem dados")
         return
     survey_uuid = data[0]['uuid']
     #schedule_task(lambda: send_email(data, survey_uuid))
     #schedule_task(lambda: send_wpp(data, survey_uuid))
     #schedule_task(lambda: send_teste([data[0]], survey_uuid))
 
-    #print(data[0])
+    print(data[0])
     
     logging.warning(f"[{datetime.now()}] - {data[0]['unidade']} - {data[0]['area_pesquisa']}  - Disparo agendado!")
     print(f"{data[0]['unidade']} - {data[0]['area_pesquisa']} -  schedulers iniciado")

@@ -2,13 +2,20 @@ import logging
 from datetime import datetime
 from app.scheduler import schedulers
 from app.db.querys_mv import ING_OTO,HAT
+from app.service.survey_uuid import get_survey_uuid
 from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
 from app.db.querys_tasy import HAC,HPM_HST,HSMC
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
-
-def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=None, uuid_ps=None,uuid_onc=None):
+def data_search(hospital):
+    
+    uuid_amb = get_survey_uuid(hospital)["ambulatorio"]
+    uuid_exa = get_survey_uuid(hospital)["exames"]
+    uuid_int = get_survey_uuid(hospital)["internacao"]  
+    uuid_mat = get_survey_uuid(hospital)["maternidade"]
+    uuid_ps = get_survey_uuid(hospital)["pronto_socorro"]
+    uuid_onc = get_survey_uuid(hospital)["oncologia"]
     
     if hospital in 'HMS':
         dbHospital = HMS
@@ -72,14 +79,7 @@ def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=
 
 def start(hospital):
 
-    data = data_search(hospital=hospital,
-                      uuid_amb='913ef30e-6e75-45b6-acdd-eb78e1bb4626', 
-                      uuid_exa='ed7bd007-0dd9-4b0d-9e08-c0dbf2cdfb3c', 
-                      uuid_int='2a2b33c5-a390-47c7-8914-48a396ced12b', 
-                      uuid_mat='291ac361-6ee5-4054-9a53-22653fbf2728',
-                      uuid_ps='a0877963-76f0-4868-9444-8ba21590f676',
-                      uuid_onc='0eced015-e625-4381-9ae3-1ecaf6bf5320'
-                      )
+    data = data_search(hospital=hospital)
     if data is None or len(data) == 0:
         logging.warning(f"[{datetime.now()}] - Sem dados para {hospital}")
         return

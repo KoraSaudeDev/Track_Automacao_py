@@ -212,31 +212,6 @@ Cada hospital possui seu próprio metedo de query em `app/db/querys_mv/` ou `app
 3. Adicione o hospital em `app/service/survey_uuid.py`
 4. Configure os UUIDs das pesquisas
 
-
-### Valores Válidos para `area_pesquisa`
-- `"AMBULATORIO"` - Consultas ambulatoriais
-- `"EXAMES"` - Exames laboratoriais e de imagem
-- `"INTERNACAO"` - Pacientes internados
-- `"MATERNIDADE"` - Pacientes obstétricas
-- `"PRONTO SOCORRO GERAL"` - Atendimentos de emergência
-- `"ONCOLOGIA"` - Tratamentos oncológicos
-
-### Valores Válidos para `setor`
-- **Ambulatório**: `"GERAL_AMBULATORIO"`, `"CARDIOLOGIA"`, `"ORTOPEDIA"`, etc.
-- **Exames**: `"LABORATORIO"`, `"HEMODINAMICA"`, `"ULTRASSOM"`, etc.
-- **Pronto Socorro**: `"PA_ADULTO"`, `"PA_PEDIATRICO"`, `"PA_OBSTÉTRICO"`, etc.
-- **Internação**: `"ENFERMARIA"`, `"UTI"`, `"SEMI_INTENSIVO"`, etc.
-
-
-
-### Validações Importantes
-- **Email**: Deve ser válido e não conter "NAO" ou valores nulos
-- **Telefone**: Deve incluir código do país (55) + DDD + número
-- **CPF**: Apenas números, sem formatação
-- **Datas**: Formato ISO 8601 (`YYYY-MM-DD HH:MM:SS`)
-- **IDs**: Valores numéricos como strings
-
-
 ## 📊 Monitoramento e Logs
 
 ### Estrutura dos Logs
@@ -289,7 +264,3 @@ CMD ["flask", "run"]
 
 
 **Versão**: 1.0.0  
-**Última atualização**: Janeiro 2025  
-**Desenvolvido por**: Equipe de Automação  
-**Mantido por**: Equipe de Desenvolvimento e Infraestrutura
-

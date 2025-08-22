@@ -1,148 +1,295 @@
-# Track_Automacao_py
+# Track Automação Python
 
-Automação completa de disparos de pesquisas Track.co utilizando Flask, integração com banco Oracle, agendamento de tarefas e envio de pesquisas por e-mail e WhatsApp.
+## 📋 Descrição
 
----
+Sistema de automação para envio de pesquisas de satisfação para pacientes de hospitais através da API Track.co. O sistema coleta dados de pacientes de diferentes áreas hospitalares (ambulatório, exames, internação, maternidade, pronto socorro e oncologia) e agenda o envio automático de pesquisas por email e WhatsApp.
 
-## Visão Geral
+## 🏥 Hospitais Suportados
 
-Este projeto foi desenvolvido para automatizar o envio de pesquisas de satisfação para pacientes, integrando-se à API Track.co e ao banco de dados Oracle hospitalar. O disparo é agendado e pode ser feito por e-mail ou WhatsApp, com logs detalhados das execuções. O código é modular, didático e pronto para expansão.
+### HUB ES (Meridional)
+- **HMS** - Meridional Serra
+- **HPC** - Meridional Praia da Costa  
+- **HMV** - Meridional Vitória
+- **HMC** - Meridional Cariacica
+- **HSF** - Hospital São Francisco
+- **HSL** - Hospital São Luiz
+- **HMSM** - Meridional São Mateus
 
----
+### Outros
+- **OTO_ING** - Otorrinolaringologia e Ingleses
+- **HAT** - Hospital de Alta Tecnologia
+- **HAC** - Hospital de Alta Complexidade
+- **HPM_HST** - Hospital de Pronto Socorro e Hospital Santa Teresa
+- **HSMC** - Hospital Santa Maria da Conceição
 
-## Estrutura de Diretórios e Explicação dos Arquivos
+## 🏗️ Arquitetura
 
-- **app/**: Diretório principal da aplicação.
-     - **__init__.py**: Inicializa o Flask, registra as rotas e inicia o agendador de automações. Ao importar, já executa o agendamento automático.
-     - **db/**: Responsável pela conexão e queries no banco Oracle.
-          - **db.py**: Função `get_connection(db_alias)` conecta ao Oracle usando variáveis de ambiente, retornando um objeto de conexão pronto para uso em queries.
-          - **querys/**: Diretorio com as queryes.
-     - **routes/**: Diretorio onde contem as rotas.
-          - **api_router.py**: Blueprint principal, define a rota `/` que retorna o status da aplicação.
-     - **scheduler/**: Gerencia o agendamento de tarefas automáticas.
-          - **schedulers.py**: Usa APScheduler para agendar o envio de pesquisas. Funções:
-                - `send_email(data, survey_uuid)`: Envia pesquisas por e-mail usando a API Track.co.
-                - `send_wpp(data, survey_uuid)`: Envia pesquisas por WhatsApp.
-                - `schedule_task(task_func)`: Agenda uma função para execução periódica.
-                - `start_schedulers(data, survey_uuid)`: Inicia o agendador e agenda as tarefas.
-          - **automations.py**: Exemplo de uso do agendador. Função `teste()` retorna dados simulados de pacientes. Função `start()` agenda o envio de pesquisas usando esses dados.
-     - **service/**: Serviços auxiliares e integrações externas.
-          - **track_api.py**: Funções para consumir a API Track.co:
-                - `getSurveys()`: Busca pesquisas disponíveis na organização.
-                - `postDistribution(survey_uuid, distribution_channel, import_lines)`: Envia pesquisas por e-mail.
-                - `postDistributionWhatsapp(survey_uuid, distribution_channel, import_lines)`: Envia pesquisas por WhatsApp, com template e integração configurados.
-          - **calc_d1.py**: Função `get_filtered_dates(reference_date=None)` retorna a data de ontem (ou de referência) no formato esperado para as queries SQL.
+```
+Track_Automacao_py/
+├── app/
+│   ├── __init__.py              # Configuração da aplicação Flask
+│   ├── db/                      # Camada de banco de dados
+│   │   ├── db.py               # Conexões Oracle (MV e TASY)
+│   │   ├── querys_mv/          # Queries para banco MV
+│   │   └── querys_tasy/        # Queries para banco TASY
+│   ├── routes/
+│   │   └── api_router.py       # Rotas da API
+│   ├── scheduler/
+│   │   ├── automations.py      # Lógica de automação principal
+│   │   └── schedulers.py       # Agendamento de tarefas
+│   └── service/
+│       ├── track_api.py        # Integração com API Track.co
+│       ├── survey_uuid.py      # UUIDs das pesquisas por hospital
+│       └── calc_d1.py         # Cálculos de datas
+├── run.py                      # Ponto de entrada da aplicação
+└── requirements.txt            # Dependências Python
+```
 
-- **requirements.txt**: Lista de dependências do projeto (Flask, cx_Oracle, APScheduler, requests, pandas, etc).
-- **run.py**: Ponto de entrada da aplicação (pode ser usado para rodar o Flask manualmente).
-- **system.log**: Arquivo de log das execuções, útil para auditoria e troubleshooting.
+## 🚀 Funcionalidades
 
----
+### Áreas de Pesquisa
+- **Ambulatório**: Consultas ambulatoriais, consultas de retorno, especialidades médicas
+- **Exames**: Exames laboratoriais, de imagem, hemodinâmica, ultrassonografia
+- **Internação**: Pacientes internados em enfermarias gerais, UTIs, semi-intensivos
+- **Maternidade**: Pacientes obstétricas, partos, cesáreas, acompanhamento pré-natal
+- **Pronto Socorro**: Atendimentos de emergência, urgência, observação
+- **Oncologia**: Tratamentos oncológicos, quimioterapia, radioterapia
 
-## Instalação e Execução Passo a Passo
+### Canais de Distribuição
+- **Email**: Envio de pesquisas por email com template personalizado
+- **WhatsApp**: Envio de pesquisas via WhatsApp com templates aprovados
+- **Links**: Geração de links únicos para pesquisas individuais
+- **Lembretes**: Sistema de lembretes automáticos (7 e 14 dias após envio)
 
-1. **Clone o repositório:**
-    ```bash
-    git clone <url-do-repositorio>
-    cd Track_Automacao_py
-    ```
-2. **Crie e ative um ambiente virtual (recomendado):**
-    ```bash
-    python -m venv venv
-    venv\Scripts\activate  # No Windows
-    # ou
-    source venv/bin/activate  # No Linux/Mac
-    ```
-3. **Instale as dependências:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-4. **Configure as variáveis de ambiente** (exemplo no `.env`):
-    ```ini
-    ORGANIZATION_UUID=...
-    API_TOKEN=...
-    DB_USERNAME=...
-    DB_PASSWORD=...
-    DB_OTO_ING_HOST=...
-    DB_OTO_ING_PORT=...
-    DB_OTO_ING_NAME=...
-    ORACLE_CLIENT_PATH=...
-    ```
-5. **Execute a aplicação:**
-    ```bash
-    flask run
-    ```
+### Tipos de Atendimento Suportados
+- **A (Ambulatório)**: Consultas agendadas, retornos, especialidades
+- **E (Exames)**: Exames externos, laboratoriais, de imagem
+- **I (Internação)**: Pacientes internados, alta hospitalar
+- **U (Urgência)**: Pronto socorro, emergências, observação
 
----
+## 🛠️ Tecnologias
 
-## Fluxo Completo do Sistema
+- **Python 3.x**
+- **Flask**: Framework web
+- **APScheduler**: Agendamento de tarefas
+- **cx_Oracle**: Conexão com banco Oracle
+- **Pandas**: Manipulação de dados
+- **Requests**: Chamadas HTTP para API externa
 
-1. **Inicialização:**
-    - Ao iniciar, o sistema executa `automations.start()`, que agenda o envio de pesquisas com dados de teste (ou reais, se adaptado).
-2. **Agendamento:**
-    - O módulo `schedulers.py` usa APScheduler para agendar tarefas.
-3. **Coleta de Dados:**
-    - O diretorio db/queryes contém os sql necessarios para cada hospital.
-4. **Logs:**
-    - Todas as operações relevantes (envio, erros, execuções) são logadas em `system.log` para auditoria e troubleshooting.
+## 📦 Instalação
 
----
+### Pré-requisitos
+- **Python**: 3.7+ (recomendado 3.9+)
+- **Oracle Client**: 19c ou superior instalado e configurado
+- **Acesso aos bancos**: MV (Meridional) e TASY (Sistema hospitalar)
 
-## Explicação Detalhada dos Principais Arquivos e Funções
 
-### app/__init__.py
+### Dependências do Sistema
+- **cx_Oracle**: Driver Oracle para Python
+- **Oracle Instant Client**: Biblioteca cliente Oracle
+- **Pandas**: Para manipulação de dados
+- **APScheduler**: Para agendamento de tarefas
+- **Flask**: Framework web para API
+- **Requests**: Para chamadas HTTP à API Track.co
 
-- Inicializa o Flask e registra o blueprint de rotas.
-- Executa o agendador de automações ao importar o módulo.
-- Função `create_app()` retorna a aplicação Flask pronta para uso.
+### 1. Clone o repositório
+```bash
+git clone <url-do-repositorio>
+cd Track_Automacao_py
+```
 
-### app/routes/api_router.py
+### 2. Crie um ambiente virtual
+```bash
+python -m venv venv
+venv\Scripts\activate  # Windows
+# ou
+source venv/bin/activate  # Linux/Mac
+```
 
-- Define a rota `/` para checagem de status da aplicação.
-- Retorna uma mensagem simples indicando que a aplicação está rodando.
+### 3. Instale as dependências
+```bash
+pip install -r requirements.txt
+```
 
-### app/scheduler/automations.py
+### 4. Configure as variáveis de ambiente
+Crie um arquivo `.env` na raiz do projeto:
 
-- Função `teste()`: Retorna uma lista de dicionários simulando pacientes (nome, e-mail, telefone, CPF).
-- Função `start()`: Chama o agendador para iniciar o envio de pesquisas usando os dados de teste e um UUID de pesquisa.
+```env
+# API Track.co
+ORGANIZATION_UUID=seu_uuid_organizacao
+API_TOKEN=seu_token_api
 
-### app/scheduler/schedulers.py
+# Banco de Dados MV (Meridional)
+DB_USERNAME=usuario_mv
+DB_PASSWORD=senha_mv
+ORACLE_CLIENT_PATH=
 
-- Usa APScheduler para agendamento.
-- Função `send_email(data, survey_uuid)`: Chama a API Track.co para enviar pesquisas por e-mail.
-- Função `send_wpp(data, survey_uuid)`: Chama a API Track.co para enviar pesquisas por WhatsApp.
-- Função `schedule_task(task_func)`: Agenda uma função para execução periódica (pode ser diária ou a cada X segundos).
-- Função `start_schedulers(data, survey_uuid)`: Agenda as tarefas e inicia o scheduler.
+# Banco de Dados TASY
+DB_USERNAME_TASY=usuario_tasy
+DB_PASSWORD_TASY=senha_tasy
 
-### app/service/track_api.py
+# Configurações dos bancos por hospital
+DB_HMS_HOST=
+DB_HMS_PORT=
+DB_HMS_NAME=
 
-- Função `getSurveys()`: Busca todas as pesquisas disponíveis na organização Track.co.
-- Função `postDistribution(survey_uuid, distribution_channel, import_lines)`: Envia pesquisas por e-mail para os pacientes informados.
-- Função `postDistributionWhatsapp(survey_uuid, distribution_channel, import_lines)`: Envia pesquisas por WhatsApp, utilizando template e integração previamente configurados na Track.co.
-- Todas as funções fazem log das operações e tratam erros, registrando no arquivo `system.log`.
+DB_HMC_HOST=
+DB_HMC_PORT=
+DB_HMC_NAME=
 
-### app/db/db.py
+DB_HPC_HOST=
+DB_HPC_PORT=
+DB_HPC_NAME=
 
-- Função `get_connection(db_alias)`: Conecta ao banco Oracle usando as variáveis de ambiente e retorna um objeto de conexão pronto para uso.
-- Utiliza o driver cx_Oracle e suporta múltiplos bancos via alias.
+DB_HMV_HOST=
+DB_HMV_PORT=
+DB_HMV_NAME=
 
-### app/service/calc_d1.py
+DB_HSF_HOST=
+DB_HSF_PORT=
+DB_HSF_NAME=
 
-- Função `get_filtered_dates(reference_date=None)`: Retorna a data de ontem (ou de referência) no formato esperado para as queries SQL.
-- Útil para buscar dados do dia anterior automaticamente.
+DB_HSL_HOST=
+DB_HSL_PORT=
+DB_HSL_NAME=
 
----
+DB_HMSM_HOST=
+DB_HMSM_PORT=
+DB_HMSM_NAME=
 
-## Endpoints Disponíveis
+DB_OTO_ING_HOST=
+DB_OTO_ING_PORT=
+DB_OTO_ING_NAME=
 
-- `GET /` — Verifica se o bot está funcionando. Retorna mensagem simples.
+DB_HAT_HOST=
+DB_HAT_PORT=
+DB_HAT_NAME=
 
----
+DB_HAC_HOST=
+DB_HAC_PORT=
+DB_HAC_NAME=
 
-## Observações Importantes
+DB_HPM_HST_HOST=
+DB_HPM_HST_PORT=
+DB_HPM_HST_NAME=
 
-- O agendamento de disparos pode ser configurado para rodar diariamente ou em outro intervalo.
-- Os logs são salvos em `system.log` e são essenciais para auditoria e troubleshooting.
-- O código é modular, facilitando manutenção e expansão.
-- O envio por WhatsApp ainda está em desenvolvimento.
+DB_HSMC_HOST=
+DB_HSMC_PORT=
+DB_HSMC_NAME=
+
+# Flask
+FLASK_RUN_PORT=5000
+```
+
+## 🚀 Execução
+
+### Execução Manual
+```bash
+flask run
+```
+
+## 📊 Monitoramento
+
+### Logs
+O sistema gera logs em `system.log` com informações sobre:
+- Conexões com bancos de dados
+- Execução de agendamentos
+- Envios de pesquisas
+- Erros e avisos
+
+### Endpoint de Status
+- **URL**: `http://localhost:5000/`
+- **Funcionalidade**: Exibe o conteúdo do log do sistema
+
+
+## 🔧 Desenvolvimento
+
+### Estrutura de Queries
+Cada hospital possui seu próprio metedo de query em `app/db/querys_mv/` ou `app/db/querys_tasy/`. Para adicionar um novo hospital:
+
+1. Crie um novo metedo seguindo o padrão existente
+2. Implemente o método `DB()` que retorna os dados dos pacientes
+3. Adicione o hospital em `app/service/survey_uuid.py`
+4. Configure os UUIDs das pesquisas
+
+
+### Valores Válidos para `area_pesquisa`
+- `"AMBULATORIO"` - Consultas ambulatoriais
+- `"EXAMES"` - Exames laboratoriais e de imagem
+- `"INTERNACAO"` - Pacientes internados
+- `"MATERNIDADE"` - Pacientes obstétricas
+- `"PRONTO SOCORRO GERAL"` - Atendimentos de emergência
+- `"ONCOLOGIA"` - Tratamentos oncológicos
+
+### Valores Válidos para `setor`
+- **Ambulatório**: `"GERAL_AMBULATORIO"`, `"CARDIOLOGIA"`, `"ORTOPEDIA"`, etc.
+- **Exames**: `"LABORATORIO"`, `"HEMODINAMICA"`, `"ULTRASSOM"`, etc.
+- **Pronto Socorro**: `"PA_ADULTO"`, `"PA_PEDIATRICO"`, `"PA_OBSTÉTRICO"`, etc.
+- **Internação**: `"ENFERMARIA"`, `"UTI"`, `"SEMI_INTENSIVO"`, etc.
+
+
+
+### Validações Importantes
+- **Email**: Deve ser válido e não conter "NAO" ou valores nulos
+- **Telefone**: Deve incluir código do país (55) + DDD + número
+- **CPF**: Apenas números, sem formatação
+- **Datas**: Formato ISO 8601 (`YYYY-MM-DD HH:MM:SS`)
+- **IDs**: Valores numéricos como strings
+
+
+## 📊 Monitoramento e Logs
+
+### Estrutura dos Logs
+O sistema gera logs detalhados em `system.log` com o seguinte formato:
+
+```
+[2025-01-15 10:30:00] - Hospital HMS iniciado
+[2025-01-15 10:30:01] - Banco conectado! MV 
+[2025-01-15 10:30:02] - HMS - AMBULATORIO -  schedulers iniciado
+[2025-01-15 10:30:03] - HMS - EXAMES -  schedulers iniciado
+[2025-01-15 10:30:04] - HMS - INTERNACAO -  schedulers iniciado
+[2025-01-15 10:30:05] - HMS - MATERNIDADE -  schedulers iniciado
+[2025-01-15 10:30:06] - HMS - PRONTO SOCORRO -  schedulers iniciado
+[2025-01-15 10:30:07] - HMS - ONCOLOGIA -  schedulers iniciado
+```
+
+### Níveis de Log
+- **INFO**: Operações normais (conexões, agendamentos)
+- **WARNING**: Avisos (hospital não encontrado, sem dados)
+- **ERROR**: Erros críticos (falha na API, erro de banco)
+
+
+## 🔒 Segurança
+
+### Variáveis de Ambiente
+- **Nunca** commite credenciais no repositório
+- Use arquivo `.env` local ou variáveis do sistema
+- Rotacione senhas regularmente
+- Use usuários com privilégios mínimos no banco
+
+### Acesso ao Banco
+- **MV**: Usuário com acesso apenas às tabelas necessárias
+- **TASY**: Usuário com permissões de leitura específicas
+
+
+
+### Docker
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 5000
+
+CMD ["flask", "run"]
+```
+
+
+**Versão**: 1.0.0  
+**Última atualização**: Janeiro 2025  
+**Desenvolvido por**: Equipe de Automação  
+**Mantido por**: Equipe de Desenvolvimento e Infraestrutura
 

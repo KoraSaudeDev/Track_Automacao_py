@@ -1,6 +1,9 @@
 import os
+import logging
 import cx_Oracle
 cx_Oracle.init_oracle_client(lib_dir=os.getenv("ORACLE_CLIENT_PATH"))
+
+logging.basicConfig(level=logging.INFO,filename="system.log")
 
 def get_connection(db_alias):
     try:
@@ -19,10 +22,10 @@ def get_connection(db_alias):
                                   password=passwd, 
                                   dsn=dsn_tns)
                                   
-        print("Banco conectado!")
+        logging.info("Banco conectado! MV ")
         return conn
     except Exception as e:
-        print(f"Erro ao conectar ao banco: {e}")
+        logging.error(f"Erro ao conectar ao banco MV: {e}") 
         return
 
 def get_connection_tasy(db_alias):
@@ -42,8 +45,8 @@ def get_connection_tasy(db_alias):
                                   password=passwd, 
                                   dsn=dsn_tns)
                                   
-        print("Banco conectado!")
+        logging.info("Banco conectado! TASY ")
         return conn
     except Exception as e:
-        print(f"Erro ao conectar ao banco: {e}")
+        logging.error(f"Erro ao conectar ao banco TASY: {e}")
         return

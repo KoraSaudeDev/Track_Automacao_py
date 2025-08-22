@@ -62,7 +62,7 @@ def DB():
                 '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
                 PR.NM_PRESTADOR AS "medico",
-                p.nr_cpf, 'HOSPITAL_DIA', 'Meridional Cariacica', 'INTERNACAO'
+                p.nr_cpf, 'INTERNACAO', 'Meridional Cariacica', 'INTERNACAO'
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 

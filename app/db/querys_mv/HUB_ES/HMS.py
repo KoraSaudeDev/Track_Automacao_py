@@ -26,7 +26,7 @@ def DB():
                 P.NR_CPF AS "cpf",
                 CASE
                     WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
-                    WHEN A.CD_ORI_ATE = 9 THEN 'HOSPITAL_DIA'
+                    WHEN A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
                     ELSE 'AMBULATORIO'
                 END AS "area_pesquisa",
                 'Meridional Serra' AS "unidade",

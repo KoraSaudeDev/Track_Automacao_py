@@ -3,6 +3,7 @@ from datetime import datetime
 from app.scheduler import schedulers
 from app.db.querys_mv import ING_OTO,HAT
 from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
+from app.db.querys_tasy import HAC,HPM_HST,HSMC
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
@@ -27,6 +28,13 @@ def data_search(hospital, uuid_amb=None, uuid_exa=None, uuid_int=None, uuid_mat=
         dbHospital = ING_OTO
     elif hospital == 'HAT':
         dbHospital = HAT
+    elif hospital == 'HAC':
+        dbHospital = HAC 
+    elif hospital == 'HPM_HST':
+        dbHospital = HPM_HST
+    elif hospital == 'HSMC':    
+        dbHospital = HSMC
+ 
 
     data_list = dbHospital.DB()
     internacao = []

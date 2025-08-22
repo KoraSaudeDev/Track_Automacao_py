@@ -1,3 +1,7 @@
+from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
+from app.db.querys_mv import ING_OTO,HAT
+from app.db.querys_tasy import HAC,HPM_HST,HSMC
+
 def get_survey_uuid(hospital):
     if hospital in 'HMS':
         return {
@@ -26,3 +30,23 @@ def get_survey_uuid(hospital):
             "pronto_socorro": None,
             "oncologia": None
         }
+
+def get_hospital():
+    hospitais = {
+        "HMS": HMS,
+        "HMC": HMC,
+        "HPC": HPC,
+        "HMV": HMV,
+        "HSF": HSF,
+        "HSL": HSL,
+        "HMSM": HMSM,
+        "OTO_ING": ING_OTO,
+        "HAT": HAT,
+        "HAC": HAC,
+        "HPM_HST": HPM_HST,
+        "HSMC": HSMC
+    }
+    return hospitais
+    
+
+

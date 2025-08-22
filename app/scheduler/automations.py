@@ -1,10 +1,8 @@
 import logging
 from datetime import datetime
 from app.scheduler import schedulers
-from app.db.querys_mv import ING_OTO,HAT
-from app.service.survey_uuid import get_survey_uuid
-from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
-from app.db.querys_tasy import HAC,HPM_HST,HSMC
+from app.service.survey_uuid import get_survey_uuid,get_hospital
+
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
@@ -17,31 +15,10 @@ def data_search(hospital):
     uuid_ps = get_survey_uuid(hospital)["pronto_socorro"]
     uuid_onc = get_survey_uuid(hospital)["oncologia"]
     
-    if hospital in 'HMS':
-        dbHospital = HMS
-    elif hospital == 'HMC':
-        dbHospital = HMC
-    elif hospital == 'HPC':
-        dbHospital = HPC
-    elif hospital == 'HMV':
-        dbHospital = HMV
-    elif hospital == 'HSF':
-        dbHospital = HSF
-    elif hospital == 'HSL':
-        dbHospital = HSL
-    elif hospital == 'HMSM':
-        dbHospital = HMSM
-    elif hospital == 'OTO_ING':
-        dbHospital = ING_OTO
-    elif hospital == 'HAT':
-        dbHospital = HAT
-    elif hospital == 'HAC':
-        dbHospital = HAC 
-    elif hospital == 'HPM_HST':
-        dbHospital = HPM_HST
-    elif hospital == 'HSMC':    
-        dbHospital = HSMC
- 
+    dbHospital = get_hospital().get(hospital)
+    if dbHospital is None:
+        logging.warning(f"[{datetime.now()}] - Hospital {hospital} não encontrado.")
+        return None
 
     data_list = dbHospital.DB()
     internacao = []

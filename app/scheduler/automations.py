@@ -29,7 +29,7 @@ def data_search(hospital):
     oncologia = []
 
     if(data_list == None or len(data_list) == 0):
-        print(f"sem dados")
+        logging.warning(f"sem dados no hostpital: {hospital}")
         return
     for data in data_list:
         if data["area_pesquisa"] == "AMBULATORIO":

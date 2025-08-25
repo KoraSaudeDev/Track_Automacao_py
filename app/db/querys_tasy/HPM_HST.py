@@ -6,6 +6,8 @@ from app.db import db
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
 def DB():
+    cursor = None
+    conn   = None
     try:
         conn     = db.get_connection_tasy("HPM_HST")
         cursor   = conn.cursor()

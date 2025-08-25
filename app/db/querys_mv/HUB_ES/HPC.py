@@ -6,7 +6,8 @@ from app.db import db
 
 
 def DB():
-
+    cursor = None
+    conn   = None
     try:
         conn     = db.get_connection('HPC')
         cursor   = conn.cursor()

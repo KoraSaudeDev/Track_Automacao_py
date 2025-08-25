@@ -5,7 +5,9 @@ from app.service.calc_d1 import get_filtered_dates
 from app.db import db
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
-def DB(hospital = None):
+def DB():
+    cursor = None
+    conn   = None
     try:
         conn     = db.get_connection("OTO_ING")
         cursor   = conn.cursor()
@@ -18,16 +20,37 @@ def DB(hospital = None):
                 A.HR_ATENDIMENTO AS "data_atendimento",
                 A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
+                PR.NM_PRESTADOR AS "medico",
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'PRONTO SOCORRO GERAL' AS "area_pesquisa",
-                CASE
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' THEN 'Hospital Oto Santos Dumont'
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' THEN 'Hospital Oto Aldeota'
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' THEN 'Hospital Oto Meireles'
-                	ELSE M.DS_RAZAO_SOCIAL 
-                END AS "unidade",
+				CASE
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOCARDIO SERVICOS MEDIC' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOLAB - SANTOS DUMONT ' 	THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - CAUCAIA' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB - MATRIZ' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25OTOLAB CLINICA ALBERTO LI' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25OTOCARE RESIDENCE' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 PRONTO ATENDIMEN OTO SUL' 	THEN 'Hospital Oto Sul'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - MATRIZ' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB - SUL' 				THEN 'Hospital Oto Sul'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOCARDIO SERVICOS MEDIC' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTO CRIO MATRIZ' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOLAB SANTOS DUMONT' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB OLIVEIRA PAIVA' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - SD' 			THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 ANGIOCARDIS - DIAGNOSTIC'    THEN 'Instituto De Neurologia De Goiania'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 CENTRO GOIANO DE ORTOPED' 	THEN 'Instituto De Neurologia De Goiania'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - INST NEUROLOGICO GO' 	    THEN 'Instituto De Neurologia De Goiania'
+					ELSE M.DS_RAZAO_SOCIAL 
+				END AS "unidade",
                 CASE 
                     WHEN A.CD_SERVICO = 5 THEN 'PA_OBSTÉTRICO'
                     WHEN A.CD_SERVICO = 40 THEN 'PA_PEDIATRICO'
@@ -36,6 +59,7 @@ def DB(hospital = None):
             FROM DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
             INNER JOIN DBAMV.MULTI_EMPRESAS M ON A.CD_MULTI_EMPRESA = M.CD_MULTI_EMPRESA
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE
                 A.TP_ATENDIMENTO = 'U'
                 AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
@@ -51,6 +75,7 @@ def DB(hospital = None):
                 A.HR_ATENDIMENTO AS "data_atendimento",
                 A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
+                PR.NM_PRESTADOR AS "medico",
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
@@ -58,12 +83,32 @@ def DB(hospital = None):
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
                 END AS "area_pesquisa",
-                CASE
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' THEN 'Hospital Oto Santos Dumont'
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' THEN 'Hospital Oto Aldeota'
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' THEN 'Hospital Oto Meireles'
-                	ELSE M.DS_RAZAO_SOCIAL 
-                END AS "unidade",
+				CASE
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOCARDIO SERVICOS MEDIC' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOLAB - SANTOS DUMONT ' 	THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - CAUCAIA' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB - MATRIZ' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25OTOLAB CLINICA ALBERTO LI' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25OTOCARE RESIDENCE' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 PRONTO ATENDIMEN OTO SUL' 	THEN 'Hospital Oto Sul'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - MATRIZ' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB - SUL' 				THEN 'Hospital Oto Sul'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOCARDIO SERVICOS MEDIC' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTO CRIO MATRIZ' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOLAB SANTOS DUMONT' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB OLIVEIRA PAIVA' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - SD' 			THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 ANGIOCARDIS - DIAGNOSTIC'    THEN 'Instituto De Neurologia De Goiania'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 CENTRO GOIANO DE ORTOPED' 	THEN 'Instituto De Neurologia De Goiania'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - INST NEUROLOGICO GO' 	    THEN 'Instituto De Neurologia De Goiania'
+					ELSE M.DS_RAZAO_SOCIAL 
+				END AS "unidade",
                 CASE
                     WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
                     ELSE 'INTERNACAO'
@@ -71,6 +116,7 @@ def DB(hospital = None):
             FROM DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
             INNER JOIN DBAMV.MULTI_EMPRESAS M ON A.CD_MULTI_EMPRESA = M.CD_MULTI_EMPRESA
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR
             LEFT JOIN DBAMV.ATENDIME A2 ON A.CD_ATENDIMENTO = A2.CD_ATENDIMENTO_PAI
             WHERE
                 A.TP_ATENDIMENTO = 'I'
@@ -92,16 +138,37 @@ def DB(hospital = None):
                 A.HR_ATENDIMENTO AS "data_atendimento",
                 A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
+                PR.NM_PRESTADOR AS "medico",
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'EXAMES' AS "area_pesquisa",
-                CASE
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' THEN 'Hospital Oto Santos Dumont'
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' THEN 'Hospital Oto Aldeota'
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' THEN 'Hospital Oto Meireles'
-                	ELSE M.DS_RAZAO_SOCIAL 
-                END AS "unidade",
+				CASE
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOCARDIO SERVICOS MEDIC' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOLAB - SANTOS DUMONT ' 	THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - CAUCAIA' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB - MATRIZ' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25OTOLAB CLINICA ALBERTO LI' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25OTOCARE RESIDENCE' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 PRONTO ATENDIMEN OTO SUL' 	THEN 'Hospital Oto Sul'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - MATRIZ' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB - SUL' 				THEN 'Hospital Oto Sul'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOCARDIO SERVICOS MEDIC' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTO CRIO MATRIZ' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOLAB SANTOS DUMONT' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB OLIVEIRA PAIVA' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - SD' 			THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 ANGIOCARDIS - DIAGNOSTIC'    THEN 'Instituto De Neurologia De Goiania'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 CENTRO GOIANO DE ORTOPED' 	THEN 'Instituto De Neurologia De Goiania'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - INST NEUROLOGICO GO' 	    THEN 'Instituto De Neurologia De Goiania'
+					ELSE M.DS_RAZAO_SOCIAL 
+				END AS "unidade",
                 CASE
                     WHEN A.CD_ORI_ATE = 103 THEN 'HEMODINAMICA'
                     WHEN A.CD_ORI_ATE IN (47, 22, 104, 106, 109) THEN 'IMAGEM'
@@ -111,9 +178,10 @@ def DB(hospital = None):
             FROM DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
             INNER JOIN DBAMV.MULTI_EMPRESAS M ON A.CD_MULTI_EMPRESA = M.CD_MULTI_EMPRESA
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR
             WHERE
                 A.TP_ATENDIMENTO = 'E'
-                AND A.CD_ORI_ATE IN (103, 47, 22, 104, 106, 109, 16, 29, 110, 100)
+                AND A.CD_ORI_ATE IN (13, 14, 16, 19, 21, 22, 29, 35, 37, 38, 47, 50, 88, 100, 103, 104, 106, 109, 110, 112, 121, 123, 125, 126)
                 AND TRUNC(A.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
 
             UNION ALL
@@ -124,16 +192,37 @@ def DB(hospital = None):
                 A.HR_ATENDIMENTO AS "data_atendimento",
                 A.HR_ALTA AS "data_saida_alta",
                 P.NM_PACIENTE AS "name",
+                PR.NM_PRESTADOR AS "medico",
                 P.EMAIL AS "email",
                 (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
                 P.NR_CPF AS "cpf",
                 'AMBULATORIO' AS "area_pesquisa",
-                CASE
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' THEN 'Hospital Oto Santos Dumont'
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' THEN 'Hospital Oto Aldeota'
-                	WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' THEN 'Hospital Oto Meireles'
-                	ELSE M.DS_RAZAO_SOCIAL 
-                END AS "unidade",
+				CASE
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL OTOCLINICA' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOCARDIO SERVICOS MEDIC' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOLAB - SANTOS DUMONT ' 	THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - CAUCAIA' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB - MATRIZ' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL SAO MATEUS' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - HOSPITAL GASTROCLINICA' 	THEN 'Hospital Oto Meireles'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25OTOLAB CLINICA ALBERTO LI' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25OTOCARE RESIDENCE' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 PRONTO ATENDIMEN OTO SUL' 	THEN 'Hospital Oto Sul'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - MATRIZ' 		THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB - SUL' 				THEN 'Hospital Oto Sul'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOCARDIO SERVICOS MEDIC' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTO CRIO MATRIZ' 			THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 OTOLAB SANTOS DUMONT' 		THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOLAB OLIVEIRA PAIVA' 	THEN 'Hospital Oto Aldeota'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - OTOIMAGEM - SD' 			THEN 'Hospital Oto Santos Dumont'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 ANGIOCARDIS - DIAGNOSTIC'    THEN 'Instituto De Neurologia De Goiania'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 CENTRO GOIANO DE ORTOPED' 	THEN 'Instituto De Neurologia De Goiania'
+					WHEN M.DS_MULTI_EMPRESA = 'TST1 - 30/01/25 - INST NEUROLOGICO GO' 	    THEN 'Instituto De Neurologia De Goiania'
+					ELSE M.DS_RAZAO_SOCIAL 
+				END AS "unidade",
                 CASE
                     WHEN A.CD_SER_DIS IN (9, 15, 30, 31, 33, 46) THEN S.DS_SER_DIS
                     ELSE 'AMBULATORIO_GERAL'
@@ -141,6 +230,7 @@ def DB(hospital = None):
             FROM DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
             INNER JOIN DBAMV.MULTI_EMPRESAS M ON A.CD_MULTI_EMPRESA = M.CD_MULTI_EMPRESA
+            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR
             LEFT JOIN DBAMV.SER_DIS S ON A.CD_SER_DIS = S.CD_SER_DIS
             WHERE
                 A.TP_ATENDIMENTO = 'A'

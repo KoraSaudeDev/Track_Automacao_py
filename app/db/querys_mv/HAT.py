@@ -14,7 +14,7 @@ def DB():
 
         data     = get_filtered_dates()[0]
         SQL = """
-                SELECT ID_FOCUS, "data_atendimento","data_saida_alta", "name", "email", "phone","cpf", "area_pesquisa","setor","unidade", "especialidade"
+               SELECT ID_FOCUS, "data_atendimento","data_saida_alta", "name", "email", "phone","cpf","unidade", "area_pesquisa","setor", "especialidade"
                       ,"SEGMENTACAO 3", "SEGMENTACAO 4", "SEGMENTACAO 5", EXTRA_INF_SETOR, "medico", "ID_EXTERNO_PACIENTE", CD_ATENDIMENTO
                 FROM (
                     SELECT ID_FOCUS, "data_atendimento","data_saida_alta", "name", "email", "phone","cpf", "area_pesquisa", "setor","unidade", "especialidade"
@@ -30,7 +30,7 @@ def DB():
                             (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
                             paciente.NR_CPF AS "cpf",
                             'Hospital Anchieta' AS "unidade",
-                            DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO SOCORRO GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
+                            DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO_SOCORRO_GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
                             SETOR.NM_SETOR "setor", ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
                             'PSO' EXTRA_INF_SETOR, PRESTADOR.NM_PRESTADOR "medico", PACIENTE.CD_PACIENTE "ID_EXTERNO_PACIENTE", ATENDIME.CD_ATENDIMENTO
                             ,atendime.Dt_Alta_Medica , atendime.Hr_Atendimento, trunc((atendime.Dt_Alta_Medica - atendime.Hr_Atendimento) * 24 * 60) tempo
@@ -57,7 +57,7 @@ def DB():
                       (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
                       paciente.NR_CPF AS "cpf",
                       'Hospital Anchieta' AS "unidade",
-                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO SOCORRO GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
+                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO_SOCORRO_GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
                       UNID_INT.DS_UNID_INT "setor",
                       ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
                       SETORES_PAC.UNIDADES_PAC EXTRA_INF_SETOR,
@@ -95,7 +95,7 @@ def DB():
                       (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
                       paciente.NR_CPF AS "cpf",
                       'Hospital Anchieta' AS "unidade",
-                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO SOCORRO GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
+                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO_SOCORRO_GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
                       SETOR.NM_SETOR "setor",
                       ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
                       'AMBULATORIO' EXTRA_INF_SETOR, PRESTADOR.NM_PRESTADOR "medico", PACIENTE.CD_PACIENTE "ID_EXTERNO_PACIENTE", ATENDIME.CD_ATENDIMENTO
@@ -144,7 +144,7 @@ def DB():
                       (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
                       paciente.NR_CPF AS "cpf",
                       'Hospital Anchieta' AS "unidade",
-                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO SOCORRO GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
+                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO_SOCORRO_GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
                       SETOR.NM_SETOR "setor",
                       ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
                       'EXAMES' EXTRA_INF_SETOR, PRESTADOR.NM_PRESTADOR "medico", PACIENTE.CD_PACIENTE "ID_EXTERNO_PACIENTE", ATENDIME.CD_ATENDIMENTO

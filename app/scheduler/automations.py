@@ -2,11 +2,12 @@ import logging
 from datetime import datetime
 from app.scheduler import schedulers
 from app.service.survey_uuid import get_survey_uuid,get_hospital
+from app.db.teste import HMC,HMS
 
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
 
-def data_search(hospital):
+def data_search(hospital,teste=None):
     
     uuid_amb = get_survey_uuid(hospital)["ambulatorio"]
     uuid_exa = get_survey_uuid(hospital)["exames"]
@@ -21,6 +22,10 @@ def data_search(hospital):
         return None
 
     data_list = dbHospital.DB()
+    if teste == "HMS" :
+        data_list = HMS.DB()
+    elif teste == "HMC":
+        data_list = HMC.DB()
     internacao = []
     exames = []
     maternidade = []   
@@ -68,4 +73,22 @@ def start(hospital):
     schedulers.start_schedulers(data=data["pronto_socorro"])
     schedulers.start_schedulers(data=data["oncologia"])
 
+def start_teste():
+    data_hms = data_search(hospital="HMS",teste="HMS")
+    data_hmc = data_search(hospital="HMC",teste="HMC")
+
+    schedulers.start_schedulers(data=data_hms["ambulatorio"])
+    schedulers.start_schedulers(data=data_hms["exames"])
+    schedulers.start_schedulers(data=data_hms["internacao"])
+    schedulers.start_schedulers(data=data_hms["maternidade"])
+    schedulers.start_schedulers(data=data_hms["pronto_socorro"])
+    schedulers.start_schedulers(data=data_hms["oncologia"])
+
+    schedulers.start_schedulers(data=data_hmc["ambulatorio"])
+    schedulers.start_schedulers(data=data_hmc["exames"])
+    schedulers.start_schedulers(data=data_hmc["internacao"])
+    schedulers.start_schedulers(data=data_hmc["maternidade"])
+    schedulers.start_schedulers(data=data_hmc["pronto_socorro"])
+    schedulers.start_schedulers(data=data_hmc["oncologia"])
+   
     

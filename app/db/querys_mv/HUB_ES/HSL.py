@@ -32,9 +32,9 @@ def DB():
 
             -- Bloco 2: Maternidade
             SELECT
-                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
-                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
-                p.nr_cpf, 'MATERNIDADE', 'Hospital São Luiz', 'MATERNIDADE'
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf", 'MATERNIDADE' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade", 'MATERNIDADE' AS "setor"
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
@@ -45,9 +45,9 @@ def DB():
 
             -- Bloco 3: Internação Geral
             SELECT
-                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
-                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
-                p.nr_cpf, 'INTERNACAO', 'Hospital São Luiz', 'INTERNACAO'
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf", 'INTERNACAO' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade", 'INTERNACAO' AS "setor"
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
@@ -59,9 +59,9 @@ def DB():
 
             -- Bloco 4: Hospital Dia e Ambulatório
             SELECT
-                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
-                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
-                p.nr_cpf, 'INTERNACAO', 'Hospital São Luiz', 'INTERNACAO'
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf", 'INTERNACAO' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade", 'INTERNACAO' AS "setor"
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
@@ -70,10 +70,10 @@ def DB():
             UNION ALL
 
             SELECT
-                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
-                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
-                p.nr_cpf, 'AMBULATORIO', 'Hospital São Luiz',
-                CASE WHEN s.cd_ser_dis IN (22, 30, 62) THEN s.ds_ser_dis ELSE 'GERAL_AMBULATORIO' END
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf", 'AMBULATORIO' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade",
+                CASE WHEN s.cd_ser_dis IN (22, 30, 62) THEN s.ds_ser_dis ELSE 'GERAL_AMBULATORIO' END AS "setor"
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN dbamv.ser_dis s ON a.cd_ser_dis = s.cd_ser_dis
@@ -84,9 +84,9 @@ def DB():
 
             -- Bloco 5: Exames (Laboratório)
             SELECT
-                '40085', a.hr_atendimento,A.HR_ALTA AS "data_saida_alta", p.nm_paciente, p.email AS "email",PR.NM_PRESTADOR AS "medico",
-                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')),
-                p.nr_cpf, 'EXAMES', 'Hospital São Luiz', 'LABORATORIO'
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+                p.nr_cpf AS "cpf", 'EXAMES' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade", 'LABORATORIO' AS "setor"
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 

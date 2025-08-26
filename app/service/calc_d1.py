@@ -8,7 +8,7 @@ def get_filtered_dates(reference_date=None):
     target_date = today - timedelta(days=1)
 
     #return [target_date.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]]
-    return ['2024-05-10 18:11:00.000']
+    return ['2024-04-14 18:11:00.000']
 
 def get_dates_reminder(day):
     dt_str = get_filtered_dates()[0]

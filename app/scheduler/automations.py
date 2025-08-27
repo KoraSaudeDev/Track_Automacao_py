@@ -77,22 +77,16 @@ def start(hospital):
     schedulers.start_schedulers(data=data["pronto_socorro"])
     schedulers.start_schedulers(data=data["oncologia"])
 
-def start_teste():
-    data_hms = data_search(hospital="HMS",teste="HMS")
-    data_hmc = data_search(hospital="HMC",teste="HMC")
+def start_teste(hospital=None):
+    data = data_search(hospital=hospital,teste=hospital)
+   
+    schedulers.start_schedulers(data=data["ambulatorio"])
+    schedulers.start_schedulers(data=data["exames"])
+    schedulers.start_schedulers(data=data["internacao"])
+    schedulers.start_schedulers(data=data["maternidade"])
+    schedulers.start_schedulers(data=data["pronto_socorro"])
+    schedulers.start_schedulers(data=data["oncologia"])
 
-    schedulers.start_schedulers(data=data_hms["ambulatorio"])
-    schedulers.start_schedulers(data=data_hms["exames"])
-    schedulers.start_schedulers(data=data_hms["internacao"])
-    schedulers.start_schedulers(data=data_hms["maternidade"])
-    schedulers.start_schedulers(data=data_hms["pronto_socorro"])
-    schedulers.start_schedulers(data=data_hms["oncologia"])
 
-    schedulers.start_schedulers(data=data_hmc["ambulatorio"])
-    schedulers.start_schedulers(data=data_hmc["exames"])
-    schedulers.start_schedulers(data=data_hmc["internacao"])
-    schedulers.start_schedulers(data=data_hmc["maternidade"])
-    schedulers.start_schedulers(data=data_hmc["pronto_socorro"])
-    schedulers.start_schedulers(data=data_hmc["oncologia"])
    
     

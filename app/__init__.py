@@ -13,7 +13,7 @@ from app.scheduler import automations
 #HSL - HOSPITAL SÃO LUIZ
 #HMSM - MERIDIONAL SÃO MATEUS
 
-automations.start('HMS')
+#automations.start('HMS')
 #automations.start('HMC')
 #automations.start('HPC')
 #automations.start('HMSM')
@@ -25,7 +25,9 @@ automations.start('HMS')
 #automations.start('HAC')
 #automations.start('HPM_HST')
 #automations.start('HSMC')
-#automations.start_teste()
+
+automations.start_teste('HMS')
+automations.start_teste('HMC')
 
 def create_app():
     app = Flask(__name__)

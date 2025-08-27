@@ -1,6 +1,7 @@
 from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
 from app.db.querys_mv import ING_OTO,HAT
 from app.db.querys_tasy import HAC,HPM_HST,HSMC
+import app.db.teste as teste
 
 def get_survey_uuid(hospital):
     if hospital in 'HMS':
@@ -48,5 +49,10 @@ def get_hospital():
     }
     return hospitais
     
-
+def get_hospital_teste():
+    hospitais_teste = {
+        "HMS": teste.HMS,
+        "HMC": teste.HMC,
+        }
+    return hospitais_teste
 

@@ -25,7 +25,7 @@ def start_schedulers(data):
         logging.warning(f"[{datetime.now()}] - sem dados")
         return
     survey_uuid = data[0]['uuid']
-    schedule_task(lambda: send_email(data, survey_uuid))
+    #schedule_task(lambda: send_email(data, survey_uuid))
     #schedule_task(lambda: send_teste([data[0]], survey_uuid))
 
     #print(data[0])

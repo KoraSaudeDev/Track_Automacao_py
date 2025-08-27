@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
 from app.scheduler import schedulers
-from app.service.survey_uuid import get_survey_uuid,get_hospital
-from app.db.teste import HMC,HMS
+from app.service.survey_uuid import get_survey_uuid,get_hospital,get_hospital_teste
+
 
 
 logging.basicConfig(level=logging.INFO,filename="system.log")
@@ -22,10 +22,14 @@ def data_search(hospital,teste=None):
         return None
 
     data_list = dbHospital.DB()
-    if teste == "HMS" :
-        data_list = HMS.DB()
-    elif teste == "HMC":
-        data_list = HMC.DB()
+    
+    if teste is not None:
+        dbHospital_teste = get_hospital_teste().get(teste)
+        if dbHospital_teste is None:
+            logging.warning(f"[{datetime.now()}] - Hospital de teste {teste} não encontrado.")
+            return None
+        data_list = dbHospital_teste.DB()
+
     internacao = []
     exames = []
     maternidade = []   

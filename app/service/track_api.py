@@ -21,7 +21,8 @@ def postDistribution(survey_uuid,distribution_channel,import_lines):
         "reminder":"whatsapp",
         "validity_at":get_dates_reminder(14),
         "reminder_at":get_dates_reminder(2),
-        "import_lines":import_lines,   
+        "import_lines":import_lines,
+        "template_invite_hash":"y7DEbI",   
         "whatsapp_reminder_template": {
             "name": "templatev1",
             "language": "pt_BR",

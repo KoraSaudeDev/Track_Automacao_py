@@ -15,132 +15,72 @@ def DB():
         data     = get_filtered_dates()[0]
 
         SQL = """
-            -- Bloco 1: Pacientes de Ambulatório, Oncologia e Hospital Dia (tp_atendimento = 'A')
-            SELECT
-                '40085' AS "ID_Cliente_Hfocus",
-                A.HR_ATENDIMENTO AS "data_atendimento",
-                A.HR_ALTA AS "data_saida_alta",
-                P.NM_PACIENTE AS "name",
-                P.EMAIL AS "email",
-                PR.NM_PRESTADOR AS "medico",
-                (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
-                P.NR_CPF AS "cpf",
-                CASE
-                    WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
-                    WHEN A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
-                    ELSE 'AMBULATORIO'
-                END AS "area_pesquisa",
-                'Meridional Serra' AS "unidade",
-                CASE
-                    WHEN A.CD_ORI_ATE IN (6, 18, 27) THEN 'ONCOLOGIA'
-                    WHEN A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
-                    WHEN A.CD_SER_DIS IN (6, 2, 3, 76, 85, 30, 51, 11) THEN S.DS_SER_DIS
-                    ELSE 'GERAL_AMBULATORIO'
-                END AS "setor"
-            FROM
-                DBAMV.ATENDIME A
-            INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
-            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
-            LEFT JOIN DBAMV.SER_DIS S ON A.CD_SER_DIS = S.CD_SER_DIS
-            WHERE
-                A.TP_ATENDIMENTO = 'A'
-                AND TRUNC(A.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-            
-            UNION ALL
-            
-            -- Bloco 2: Pacientes de Exames Externos (tp_atendimento = 'E')
-            SELECT
-                '40085' AS "ID_Cliente_Hfocus",
-                A.HR_ATENDIMENTO AS "data_atendimento",
-                A.HR_ALTA AS "data_saida_alta",
-                P.NM_PACIENTE AS "name",
-                P.EMAIL AS "email",
-                PR.NM_PRESTADOR AS "medico",
-                (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
-                P.NR_CPF AS "cpf",
-                'EXAMES' AS "area_pesquisa",
-                'Meridional Serra' AS "unidade",
-                CASE
-                    WHEN A.CD_ORI_ATE = 46 THEN 'HEMODINAMICA'
-                    WHEN A.CD_ORI_ATE = 7 THEN 'LABORATORIO'
-                END AS "setor"
-            FROM
-                DBAMV.ATENDIME A
-            INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
-            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
-            WHERE
-                A.TP_ATENDIMENTO = 'E'
-                AND A.CD_ORI_ATE IN (46, 7)
-                AND TRUNC(A.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-            
-            UNION ALL
-            
-            -- Bloco 3: Pacientes Internados (Geral e Maternidade) (tp_atendimento = 'I')
-            SELECT
-                '40085' AS "ID_Cliente_Hfocus",
-                A.HR_ATENDIMENTO AS "data_atendimento",
-                A.HR_ALTA AS "data_saida_alta",
-                P.NM_PACIENTE AS "name",
-                P.EMAIL AS "email",
-                PR.NM_PRESTADOR AS "medico",
-                (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
-                P.NR_CPF AS "cpf",
-                CASE
-                    WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
-                    ELSE 'INTERNACAO'
-                END AS "area_pesquisa",
-                'Meridional Serra' AS "unidade",
-                CASE
-                    WHEN A2.CD_ATENDIMENTO_PAI IS NOT NULL THEN 'MATERNIDADE'
-                    ELSE 'INTERNACAO'
-                END AS "setor"
-            FROM
-                DBAMV.ATENDIME A
-            INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
-            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
-            -- LEFT JOIN para identificar se o atendimento é um atendimento "pai" (mãe na maternidade)
-            LEFT JOIN DBAMV.ATENDIME A2 ON A.CD_ATENDIMENTO = A2.CD_ATENDIMENTO_PAI
-            WHERE
-                A.TP_ATENDIMENTO = 'I'
-                AND A.CD_MOT_ALT NOT IN (6, 7, 9, 17, 18, 19, 20, 21, 22)
-                -- Lógica para incluir Maternidade OU Internação Geral (que não seja da maternidade)
-                AND (
-                    A2.CD_ATENDIMENTO_PAI IS NOT NULL -- Condição da Maternidade
-                    OR 
-                    (A.CD_ATENDIMENTO_PAI IS NULL AND A.CD_CID NOT IN ('O60','O80','O82','O84','O757','O800','O801','O809','O810','O820','O821','O822','O829','O839','O840','O842','Z380','Z382')) -- Condição de Internação Geral
-                )
-                AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-            
-            UNION ALL
-            
-            -- Bloco 4: Pacientes de Pronto Socorro (tp_atendimento = 'U')
-            SELECT DISTINCT 
-                '40085' AS "ID_Cliente_Hfocus",
-                A.HR_ATENDIMENTO AS "data_atendimento",
-                A.HR_ALTA AS "data_saida_alta",
-                P.NM_PACIENTE AS "name",
-                P.EMAIL AS "email",
-                PR.NM_PRESTADOR AS "medico",
-                (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
-                P.NR_CPF AS "cpf",
-                'PRONTO SOCORRO GERAL' AS "area_pesquisa",
-                'Meridional Serra' AS "unidade",
-                CASE
-                    WHEN A.CD_SERVICO = 1 THEN 'PA_OBSTÉTRICO'
-                    WHEN A.CD_SERVICO = 27 THEN 'PA_PEDIATRICO'
-                    ELSE 'PA_ADULTO'
-                END AS "setor"
-            FROM
-                DBAMV.ATENDIME A
-            INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
-            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
-            WHERE
-                A.TP_ATENDIMENTO = 'U'
-                AND A.CD_TIP_RES NOT IN (1, 4, 11)
-                AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-            
-            ORDER BY
-                "setor", "unidade"
+                SELECT 
+			    '40085' AS "ID_Cliente_Hfocus",
+			    A.HR_ATENDIMENTO AS "data_atendimento",
+			    A.HR_ALTA AS "data_saida_alta",
+			    P.NM_PACIENTE AS "name",
+			    P.EMAIL AS "email",
+			    PR.NM_PRESTADOR AS "medico",
+			    (NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
+			    P.NR_CPF AS "cpf",
+			    'Meridional Serra' AS "unidade",
+			
+			    CASE
+			        WHEN A.TP_ATENDIMENTO = 'A' AND A.CD_ORI_ATE = 21 THEN 'ONCOLOGIA'
+			        WHEN A.TP_ATENDIMENTO = 'E' THEN 'EXAMES'
+			        WHEN A.TP_ATENDIMENTO = 'I' THEN 'INTERNACAO'
+			        WHEN A.TP_ATENDIMENTO = 'A' AND A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
+			        WHEN A.TP_ATENDIMENTO = 'A' AND A.CD_SER_DIS IS NOT NULL THEN 'AMBULATORIO'
+			        WHEN A.TP_ATENDIMENTO = 'U' THEN 'PRONTO_SOCORRO_GERAL'
+			        ELSE 'OUTROS'
+			    END AS "area_pesquisa",
+			    
+			    CASE
+			        WHEN A.TP_ATENDIMENTO = 'A' AND A.CD_ORI_ATE = 21 THEN 'ONCOLOGIA'
+			        WHEN A.TP_ATENDIMENTO = 'E' AND A.CD_ORI_ATE = 46 THEN 'HEMODINAMICA'
+			        WHEN A.TP_ATENDIMENTO = 'E' AND A.CD_ORI_ATE = 7 THEN 'LABORATORIO'
+			        WHEN A.TP_ATENDIMENTO = 'I' THEN 'INTERNACAO'
+			        WHEN A.TP_ATENDIMENTO = 'A' AND A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
+			        WHEN A.TP_ATENDIMENTO = 'A' AND A.CD_SER_DIS IN (6,2,3,76,85,30,51,11) THEN S.DS_SER_DIS
+			        WHEN A.TP_ATENDimento = 'A' AND A.CD_SER_DIS NOT IN (6,2,3,76,85,30,51,11) THEN 'GERAL_AMBULATORIO'
+			        WHEN A.TP_ATENDIMENTO = 'U' AND A.CD_SERVICO = 1 THEN 'PA_OBSTÉTRICO'
+			        WHEN A.TP_ATENDIMENTO = 'U' AND A.CD_SERVICO = 27 THEN 'PA_PEDIATRICO'
+			        WHEN A.TP_ATENDIMENTO = 'U' THEN 'PA_ADULTO'
+			        ELSE 'NAO_DEFINIDO'
+			    END AS "setor"
+			    
+			FROM
+			    DBAMV.ATENDIME A
+			INNER JOIN 
+			    DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
+			INNER JOIN 
+			    DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR
+			LEFT JOIN 
+			    DBAMV.SER_DIS S ON A.CD_SER_DIS = S.CD_SER_DIS
+			    
+			WHERE
+			    (
+			        (A.TP_ATENDIMENTO IN ('A', 'E') AND TRUNC(A.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')))
+			        OR
+			        (A.TP_ATENDIMENTO IN ('I', 'U') AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')))
+			    )
+			    AND (
+			        -- ONCOLOGIA
+			        (A.TP_ATENDIMENTO = 'A' AND A.CD_ORI_ATE = 21)
+			        -- EXAMES (HEMODINAMICA E LABORATORIO)
+			        OR (A.TP_ATENDIMENTO = 'E' AND A.CD_ORI_ATE IN (46, 7))
+			        -- INTERNAÇÃO
+			        OR (A.TP_ATENDIMENTO = 'I' AND A.CD_ATENDIMENTO_PAI IS NULL AND A.CD_CID NOT IN ('O60','O80','O82','O84','O757','O800','O801','O809','O810','O820','O821','O822','O829','O839','O840','O842','Z380','Z382') AND A.CD_MOT_ALT NOT IN (6,7,9,17,18,19,20,21,22))
+			        -- HOSPITAL DIA
+			        OR (A.TP_ATENDIMENTO = 'A' AND A.CD_ORI_ATE = 9)
+			        -- AMBULATÓRIO
+			        OR (A.TP_ATENDIMENTO = 'A' AND A.CD_SER_DIS IS NOT NULL AND A.CD_ORI_ATE NOT IN (21,9))
+			        -- PRONTO SOCORRO
+			        OR (A.TP_ATENDIMENTO = 'U' AND A.CD_TIP_RES NOT IN (1, 4, 11))
+			    )
+			ORDER BY
+			    "setor", "unidade"
         """
         cursor.execute(SQL, {'data': data})
 

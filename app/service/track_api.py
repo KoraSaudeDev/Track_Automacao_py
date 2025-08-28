@@ -18,7 +18,7 @@ def postDistribution(survey_uuid,distribution_channel,import_lines):
     data = {
         "survey_uuid":survey_uuid,
         "distribution_channel":"email",
-        "reminder":"whatsapp",
+        "reminder_channel":"whatsapp",
         "validity_at":get_dates_reminder(14),
         "reminder_at":get_dates_reminder(2),
         "import_lines":import_lines,

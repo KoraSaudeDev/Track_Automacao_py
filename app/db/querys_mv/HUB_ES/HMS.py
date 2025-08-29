@@ -15,7 +15,7 @@ def DB():
         data     = get_filtered_dates()[0]
 
         SQL = """
-                SELECT 
+			SELECT 
 			    '40085' AS "ID_Cliente_Hfocus",
 			    A.HR_ATENDIMENTO AS "data_atendimento",
 			    A.HR_ALTA AS "data_saida_alta",
@@ -32,7 +32,7 @@ def DB():
 			        WHEN A.TP_ATENDIMENTO = 'I' THEN 'INTERNACAO'
 			        WHEN A.TP_ATENDIMENTO = 'A' AND A.CD_ORI_ATE = 9 THEN 'INTERNACAO'
 			        WHEN A.TP_ATENDIMENTO = 'A' AND A.CD_SER_DIS IS NOT NULL THEN 'AMBULATORIO'
-			        WHEN A.TP_ATENDIMENTO = 'U' THEN 'PRONTO SOCORRO GERAL'
+			        WHEN A.TP_ATENDIMENTO = 'U' THEN 'PRONTO_SOCORRO_GERAL'
 			        ELSE 'OUTROS'
 			    END AS "area_pesquisa",
 			    
@@ -79,8 +79,37 @@ def DB():
 			        -- PRONTO SOCORRO
 			        OR (A.TP_ATENDIMENTO = 'U' AND A.CD_TIP_RES NOT IN (1, 4, 11))
 			    )
-			ORDER BY
-			    "setor", "unidade"
+			
+			   UNION ALL
+			    
+				select 
+				 '40085'                        "ID_Cliente_Hfocus",
+				A.HR_ATENDIMENTO AS "data_atendimento",
+				A.HR_ALTA AS "data_saida_alta",
+				P.NM_PACIENTE AS "name",
+				P.EMAIL AS "email",
+				PR.NM_PRESTADOR AS "medico",
+				(NVL(P.NR_DDI_CELULAR, '55') || NVL(P.NR_DDD_CELULAR, '') || NVL(P.NR_CELULAR, '')) AS "phone",
+				P.NR_CPF					 AS "cpf",
+				'Meridional Serra'           AS "unidade",
+				'MATERNIDADE'                AS "area_pesquisa",
+				'MATERNIDADE'                AS "setor"
+				from
+				 dbamv.paciente    p
+				,dbamv.atendime    a
+				,dbamv.atendime    a2
+				,DBAMV.PRESTADOR PR
+				
+				where
+				    p.cd_paciente = a.cd_paciente
+				AND A.CD_PRESTADOR = PR.CD_PRESTADOR
+				and a.tp_atendimento = 'I'
+				and a.cd_mot_alt not in (6,7,9,17,18,19,20,21,22)
+				and a.CD_ATENDIMENTO = a2.CD_ATENDIMENTO_PAI
+				and TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+				       
+				ORDER BY
+				    "setor", "unidade"
         """
         cursor.execute(SQL, {'data': data})
 

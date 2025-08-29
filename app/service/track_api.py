@@ -10,7 +10,7 @@ url_api = "https://api.track.co"
 ORGANIZATION_UUID = os.getenv("ORGANIZATION_UUID")
 API_TOKEN = os.getenv("API_TOKEN")
 
-def postDistribution(survey_uuid,distribution_channel,import_lines):
+def postDistribution(survey_uuid,distribution_channel,import_lines,template=None):
     url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"
     headers = {
         "Authorization": f"Bearer {API_TOKEN}"
@@ -22,7 +22,9 @@ def postDistribution(survey_uuid,distribution_channel,import_lines):
         "validity_at":get_dates_reminder(14),
         "reminder_at":get_dates_reminder(2),
         "import_lines":import_lines,
-        "template_invite_hash":"y7DEbI",   
+        "template_invite_hash":template["template_invite_hash"], #Convite  
+        "template_expired_hash":template["template_expired_hash"],#Pesquisa expirada
+        "template_thanks_hash":template["template_thanks_hash"], #Pesquisa completa
         "whatsapp_reminder_template": {
             "name": "templatev1",
             "language": "pt_BR",

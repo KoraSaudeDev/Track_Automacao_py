@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from app.scheduler import schedulers
-from app.service.survey_uuid import get_survey_uuid,get_hospital,get_hospital_teste
+from app.service.survey_uuid import get_survey_uuid,get_hospital,get_hospital_teste, get_template
 
 
 
@@ -69,23 +69,25 @@ def start(hospital):
     if data is None or len(data) == 0:
         logging.warning(f"[{datetime.now()}] - Sem dados para {hospital}")
         return
+    template = get_template(hospital)
 
-    schedulers.start_schedulers(data=data["ambulatorio"])
-    schedulers.start_schedulers(data=data["exames"])
-    schedulers.start_schedulers(data=data["internacao"])
-    schedulers.start_schedulers(data=data["maternidade"])
-    schedulers.start_schedulers(data=data["pronto_socorro"])
-    schedulers.start_schedulers(data=data["oncologia"])
+    schedulers.start_schedulers(data=data["ambulatorio"],template=template)
+    schedulers.start_schedulers(data=data["exames"],template=template)
+    schedulers.start_schedulers(data=data["internacao"],template=template)
+    schedulers.start_schedulers(data=data["maternidade"],template=template)
+    schedulers.start_schedulers(data=data["pronto_socorro"],template=template)
+    schedulers.start_schedulers(data=data["oncologia"],template=template)
 
 def start_teste(hospital=None):
+    template = get_template(hospital)
     data = data_search(hospital=hospital,teste=hospital)
    
-    schedulers.start_schedulers(data=data["ambulatorio"])
-    schedulers.start_schedulers(data=data["exames"])
-    schedulers.start_schedulers(data=data["internacao"])
-    schedulers.start_schedulers(data=data["maternidade"])
-    schedulers.start_schedulers(data=data["pronto_socorro"])
-    schedulers.start_schedulers(data=data["oncologia"])
+    schedulers.start_schedulers(data=data["ambulatorio"],template=template)
+    schedulers.start_schedulers(data=data["exames"],template=template)
+    schedulers.start_schedulers(data=data["internacao"],template=template)
+    schedulers.start_schedulers(data=data["maternidade"],template=template)
+    schedulers.start_schedulers(data=data["pronto_socorro"],template=template)
+    schedulers.start_schedulers(data=data["oncologia"],template=template)
 
 
    

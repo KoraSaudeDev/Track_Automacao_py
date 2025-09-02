@@ -17,8 +17,8 @@ def send_teste(data, survey_uuid):
     track_api.postImportLines(survey_uuid,data)
 
 def schedule_task(task_func):
-    #scheduler.add_job(task_func, 'interval', days=1)
-    scheduler.add_job(task_func,'interval',seconds=60)
+    scheduler.add_job(task_func, 'interval', days=1)
+    #scheduler.add_job(task_func,'interval',seconds=60)
     
 def start_schedulers(data,template=None):
     if(data == None or len(data) == 0):

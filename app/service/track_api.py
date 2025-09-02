@@ -26,10 +26,10 @@ def postDistribution(survey_uuid,distribution_channel,import_lines,template=None
         "template_expired_hash":template["template_expired_hash"],#Pesquisa expirada
         "template_thanks_hash":template["template_thanks_hash"], #Pesquisa completa
         "whatsapp_reminder_template": {
-            "name": "templatev1",
+            "name": template["wpp_name"],
             "language": "pt_BR",
-            "variables": ["customer.name"],
-            "id_provider": "HX1a01a858bf1894eaa0053240f6a7ad84"
+            "variables": ["customer.firstname","interaction.area_pesquisa"],
+            "id_provider": template["id_provider"]
             },
         "whatsapp_integration_uuid": "a726be1e-7be0-4add-b983-9c0e46a693db"
  

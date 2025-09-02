@@ -116,6 +116,8 @@ def get_template(hospital):
         return {
             "template_invite_hash":"sCrfzj",   
             "template_expired_hash":"2StHdo",
-            "template_thanks_hash":"NO5dtr"
+            "template_thanks_hash":"NO5dtr",
+            "wpp_name":"templatemeridional",
+            "id_provider":"HXe9f93f4a14efe94040ed057d46c12e42"
         }
 

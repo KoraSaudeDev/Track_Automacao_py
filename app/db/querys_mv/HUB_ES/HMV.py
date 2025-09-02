@@ -114,6 +114,7 @@ def DB():
                 CASE
                     WHEN a.cd_ori_ate = 0 THEN 'HEMODINAMICA'
                     WHEN a.cd_ori_ate = 15 THEN 'LABORATORIO'
+                    WHEN a.CD_ORI_ATE = 13 THEN  'IMAGEM'
                 END AS "setor"
             FROM
                 dbamv.paciente p
@@ -121,7 +122,7 @@ def DB():
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE
                 a.tp_atendimento = 'E'
-                AND a.cd_ori_ate IN (0, 15)
+                AND a.cd_ori_ate IN (0, 15,13)
                 AND a.cd_multi_empresa = '2' -- Adicionado para consistência
                 AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
 

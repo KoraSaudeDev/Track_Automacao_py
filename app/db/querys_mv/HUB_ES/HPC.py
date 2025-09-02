@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 import pandas as pd
 from app.service.calc_d1 import get_filtered_dates
+from app.db.querys_mv.HUB_ES.SUB_SELECT.SUB_HSL import DB_SUB
 from app.db import db
 
 
@@ -113,8 +114,13 @@ def DB():
         df["data_saida_alta"] = pd.to_datetime(df["data_saida_alta"]).dt.strftime("%Y-%m-%d %H:%M:%S")
         df["data_atendimento"] = pd.to_datetime(df["data_atendimento"]).dt.strftime("%Y-%m-%d %H:%M:%S")
         dict_data = df.to_dict(orient='records')
+        
+        if len(DB_SUB()) == 0:
+            return dict_data
+        
+        dict_data_all = dict_data + DB_SUB()
 
-        return dict_data
+        return dict_data_all
     except Exception as e:
         logging.error(f"[{datetime.now()}] Erro ao aplicar a  query {__name__}: {e}")
         print(f"[{datetime.now()}] Erro ao aplicar a  query {__name__}: {e}")

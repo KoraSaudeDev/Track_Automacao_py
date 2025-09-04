@@ -79,7 +79,11 @@ def DB():
 			        -- PRONTO SOCORRO
 			        OR (A.TP_ATENDIMENTO = 'U' AND A.CD_TIP_RES NOT IN (1, 4, 11))
 			    )
-			
+				AND TRUNC(a.hr_atendimento) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))	
+			    AND (
+				      a.HR_ALTA IS NULL
+				      OR TRUNC(a.HR_ALTA) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+				)
 			   UNION ALL
 			    
 				select 
@@ -107,6 +111,11 @@ def DB():
 				and a.cd_mot_alt not in (6,7,9,17,18,19,20,21,22)
 				and a.CD_ATENDIMENTO = a2.CD_ATENDIMENTO_PAI
 				and TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+				AND TRUNC(a.hr_atendimento) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))	
+				AND (
+				      a.HR_ALTA IS NULL
+				      OR TRUNC(a.HR_ALTA) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+				)
 				       
 				ORDER BY
 				    "setor", "unidade"

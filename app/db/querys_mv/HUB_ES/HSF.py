@@ -27,7 +27,11 @@ def DB():
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE a.tp_atendimento = 'U' AND a.cd_tip_res NOT IN (6, 17, 21) AND a.cd_servico IN (23, 37, 40) AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
+			AND TRUNC(a.hr_atendimento) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))	
+            AND (
+	      		a.HR_ALTA IS NULL
+		      	OR TRUNC(a.HR_ALTA) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+			)
             UNION ALL
 
             -- Bloco 2: Maternidade
@@ -40,7 +44,11 @@ def DB():
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             INNER JOIN dbamv.atendime a2 ON a.cd_atendimento = a2.cd_atendimento_pai
             WHERE a.tp_atendimento = 'I' AND a.cd_mot_alt NOT IN (11, 12, 13, 49, 50, 51) AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
+			AND TRUNC(a.hr_atendimento) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))	
+            AND (
+	      		a.HR_ALTA IS NULL
+		      	OR TRUNC(a.HR_ALTA) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+			)
             UNION ALL
 
             -- Bloco 3: Internação Geral
@@ -54,7 +62,11 @@ def DB():
             WHERE a.tp_atendimento = 'I'
             AND a.cd_cid NOT IN ('O60','O80','O82','O84','O757','O800','O801','O809','O810','O820','O821','O822','O829','O839','O840','O842','Z380','Z382')
             AND a.cd_mot_alt NOT IN (11, 12, 13, 49, 50, 51) AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
+			AND TRUNC(a.hr_atendimento) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))	
+            AND (
+	      		a.HR_ALTA IS NULL
+		      	OR TRUNC(a.HR_ALTA) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+			)
             UNION ALL
 
             -- Bloco 4: Hospital Dia e Ambulatório
@@ -66,7 +78,11 @@ def DB():
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE a.tp_atendimento = 'E' AND a.cd_ori_ate = 15 AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
+			AND TRUNC(a.hr_atendimento) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))	
+            AND (
+	      		a.HR_ALTA IS NULL
+		      	OR TRUNC(a.HR_ALTA) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+			)
             UNION ALL
 
             SELECT
@@ -79,6 +95,11 @@ def DB():
             INNER JOIN dbamv.ser_dis s ON a.cd_ser_dis = s.cd_ser_dis
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE a.tp_atendimento = 'A' AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+			AND TRUNC(a.hr_atendimento) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))	
+            AND (
+	      		a.HR_ALTA IS NULL
+		      	OR TRUNC(a.HR_ALTA) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+			)
         """
         cursor.execute(SQL, {'data': data})
 

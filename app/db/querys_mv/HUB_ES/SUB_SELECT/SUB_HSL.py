@@ -25,6 +25,11 @@ def DB_SUB():
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente
             INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR 
             WHERE a.tp_atendimento = 'E' AND a.cd_ori_ate = 8 AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+    		AND TRUNC(a.hr_atendimento) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))		
+            AND (
+	      			a.HR_ALTA IS NULL
+		      		OR TRUNC(a.HR_ALTA) <= TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+				)    
             """
 
         cursor.execute(SQL, {'data': data})

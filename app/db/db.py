@@ -1,6 +1,8 @@
 import os
 import logging
 import cx_Oracle
+from dotenv import load_dotenv
+load_dotenv()
 cx_Oracle.init_oracle_client(lib_dir=os.getenv("ORACLE_CLIENT_PATH"))
 
 logging.basicConfig(level=logging.INFO,filename="system.log")

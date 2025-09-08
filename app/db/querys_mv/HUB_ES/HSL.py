@@ -19,7 +19,7 @@ def DB():
 
             -- Bloco 1: Pronto Socorro
             SELECT
-                '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name",PR.NM_PRESTADOR AS "medico",
+                '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta",A.CD_ATENDIMENTO AS "cd_atendimento",  p.nm_paciente AS "name",PR.NM_PRESTADOR AS "medico",
                 p.email AS "email", (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'PRONTO SOCORRO GERAL' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade",
                 CASE WHEN a.cd_servico = 40 THEN 'PA_PEDIATRICO' WHEN a.cd_servico = 5 THEN 'PA_OBSTETRICO' ELSE 'PA_ADULTO' END AS "setor"
@@ -36,7 +36,7 @@ def DB():
 
             -- Bloco 2: Maternidade
             SELECT
-                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta",A.CD_ATENDIMENTO AS "cd_atendimento",  p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'MATERNIDADE' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade", 'MATERNIDADE' AS "setor"
             FROM dbamv.paciente p
@@ -53,7 +53,7 @@ def DB():
 
             -- Bloco 3: Internação Geral
             SELECT
-                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta",A.CD_ATENDIMENTO AS "cd_atendimento",  p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'INTERNACAO' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade", 'INTERNACAO' AS "setor"
             FROM dbamv.paciente p
@@ -71,7 +71,7 @@ def DB():
 
             -- Bloco 4: Hospital Dia e Ambulatório
             SELECT
-                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta",A.CD_ATENDIMENTO AS "cd_atendimento",  p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'INTERNACAO' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade", 'INTERNACAO' AS "setor"
             FROM dbamv.paciente p
@@ -86,7 +86,7 @@ def DB():
             UNION ALL
 
             SELECT
-                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta",A.CD_ATENDIMENTO AS "cd_atendimento",  p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'AMBULATORIO' AS "area_pesquisa", 'Hospital São Luiz' AS "unidade",
                 CASE WHEN s.cd_ser_dis IN (22, 30, 62) THEN s.ds_ser_dis ELSE 'GERAL_AMBULATORIO' END AS "setor"

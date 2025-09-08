@@ -17,7 +17,7 @@ def DB_SUB():
 
         SQL = """
             SELECT    
-                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
+                '40085', a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta",A.CD_ATENDIMENTO AS "cd_atendimento", p.nm_paciente AS "name", p.email AS "email",PR.NM_PRESTADOR AS "medico",
                 (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
                 p.nr_cpf AS "cpf", 'EXAMES' AS "area_pesquisa", 'Meridional Praia Da Costa' AS "unidade",
                 CASE WHEN a.cd_ori_ate = 8 THEN 'LABORATORIO' END  AS "setor"

@@ -14,151 +14,79 @@ def DB():
 
         data     = get_filtered_dates()[0]
         SQL = """
-               SELECT ID_FOCUS, "data_atendimento","data_saida_alta", "name", "email", "phone","cpf","unidade", "area_pesquisa","setor", "especialidade"
-                      ,"SEGMENTACAO 3", "SEGMENTACAO 4", "SEGMENTACAO 5", EXTRA_INF_SETOR, "medico", "ID_EXTERNO_PACIENTE", CD_ATENDIMENTO
-                FROM (
-                    SELECT ID_FOCUS, "data_atendimento","data_saida_alta", "name", "email", "phone","cpf", "area_pesquisa", "setor","unidade", "especialidade"
-                          ,"SEGMENTACAO 3", "SEGMENTACAO 4", "SEGMENTACAO 5", EXTRA_INF_SETOR, "medico", "ID_EXTERNO_PACIENTE", CD_ATENDIMENTO
-                          ,Dt_Alta_Medica, Hr_Atendimento
-                          ,tempo, (percent_rank() over (partition by 1 order by tempo)* 100) ranking, ROW_NUMBER() over (partition by 1 order by tempo) qtde
-                          ,(select count(1) from dbamv.atendime where tp_atendimento = 'U' and trunc(DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) and atendime.dt_alta_medica is not null) total
-                      FROM (
-                      select 40094 ID_FOCUS,
-                            CAST(dbamv.fnc_mv_recupera_data_hora(ATENDIME.DT_ATENDIMENTO, atendime.hr_atendimento) AS TIMESTAMP) "data_atendimento",
-                            CAST(atendime.Dt_Alta_Medica AS TIMESTAMP) AS "data_saida_alta",
-                            paciente.nm_paciente "name", paciente.email "email",
-                            (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
-                            paciente.NR_CPF AS "cpf",
-                            'Hospital Anchieta' AS "unidade",
-                            DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO_SOCORRO_GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
-                            SETOR.NM_SETOR "setor", ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
-                            'PSO' EXTRA_INF_SETOR, PRESTADOR.NM_PRESTADOR "medico", PACIENTE.CD_PACIENTE "ID_EXTERNO_PACIENTE", ATENDIME.CD_ATENDIMENTO
-                            ,atendime.Dt_Alta_Medica , atendime.Hr_Atendimento, trunc((atendime.Dt_Alta_Medica - atendime.Hr_Atendimento) * 24 * 60) tempo
-                      from dbamv.atendime, dbamv.paciente, dbamv.setor, dbamv.ori_ate, DBAMV.ESPECIALID, DBAMV.PRESTADOR
-                      WHERE paciente.cd_paciente = atendime.cd_paciente
-                        AND SETOR.CD_SETOR = ORI_ATE.CD_SETOR
-                        AND ORI_ATE.CD_ORI_ATE = ATENDIME.CD_ORI_ATE
-                        AND ATENDIME.CD_ESPECIALID = ESPECIALID.CD_ESPECIALID
-                        AND PRESTADOR.CD_PRESTADOR = ATENDIME.CD_PRESTADOR
-                        and upper(paciente.email) not like ('%NAO%')
-                        AND NVL(ATENDIME.CD_TIP_RES,0)  NOT IN (6,5,8,17,13,14)
-                        AND TP_ATENDIMENTO = 'U'
-                        and trunc(DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-                      )
-                )
-                -- WHERE qtde <= (total * 1)
+          SELECT
+              40094                                                               AS id_focus,
 
-                UNION ALL
+              CAST(
+                  CASE
+                      WHEN a.tp_atendimento = 'I' THEN dbamv.fnc_mv_recupera_data_hora(a.dt_alta, a.hr_alta)
+                      ELSE dbamv.fnc_mv_recupera_data_hora(a.dt_atendimento, a.hr_atendimento)
+                  END
+              AS TIMESTAMP)                                                       AS "data_atendimento",
 
-                select 40094 ID_FOCUS,
-                      CAST(dbamv.fnc_mv_recupera_data_hora(DT_ALTA, atendime.hr_alta) AS TIMESTAMP) "data_atendimento",
-                      CAST(ATENDIME.DT_ALTA AS TIMESTAMP) AS "data_saida_alta",
-                      paciente.nm_paciente "name", paciente.email "email",
-                      (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
-                      paciente.NR_CPF AS "cpf",
-                      'Hospital Anchieta' AS "unidade",
-                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO_SOCORRO_GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
-                      UNID_INT.DS_UNID_INT "setor",
-                      ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
-                      SETORES_PAC.UNIDADES_PAC EXTRA_INF_SETOR,
-                      PRESTADOR.NM_PRESTADOR "medico", PACIENTE.CD_PACIENTE "ID_EXTERNO_PACIENTE", ATENDIME.CD_ATENDIMENTO
-                  from dbamv.atendime, dbamv.paciente, dbamv.setor, dbamv.ori_ate, DBAMV.ESPECIALID, DBAMV.PRESTADOR, DBAMV.MOT_ALT, DBAMV.LEITO, DBAMV.UNID_INT,
-                      (select CD_ATENDIMENTO,LISTAGG(DS_UNID_INT, ' / ') WITHIN GROUP (ORDER BY DS_UNID_INT) AS UNIDADES_PAC
-                        from (SELECT distinct cd_atendimento, ds_unid_int
-                                          FROM DBAMV.MOV_INT, DBAMV.LEITO, DBAMV.UNID_INT
-                                        WHERE LEITO.CD_LEITO = MOV_INT.CD_LEITO
-                                          AND LEITO.CD_UNID_INT = UNID_INT.CD_UNID_INT
-                                          and cd_atendimento is not null)
-                                          GROUP BY CD_ATENDIMENTO) SETORES_PAC
-                WHERE paciente.cd_paciente = atendime.cd_paciente
-                  AND SETOR.CD_SETOR = UNID_INT.CD_SETOR
-                  AND ORI_ATE.CD_ORI_ATE = ATENDIME.CD_ORI_ATE
-                  AND LEITO.CD_LEITO = ATENDIME.CD_LEITO
-                  AND LEITO.CD_UNID_INT = UNID_INT.CD_UNID_INT
-                  AND ATENDIME.CD_ESPECIALID = ESPECIALID.CD_ESPECIALID
-                  AND PRESTADOR.CD_PRESTADOR = ATENDIME.CD_PRESTADOR
-                  AND MOT_ALT.CD_MOT_ALT = ATENDIME.CD_MOT_ALT
-                  AND SETORES_PAC.CD_ATENDIMENTO(+) = ATENDIME.CD_ATENDIMENTO
-                  and trunc(DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-                  AND MOT_ALT.TP_MOT_ALTA <> 'O'
-                  AND TP_ATENDIMENTO = 'I'
-                  and upper(paciente.email) not like ('%NAO%')
-                  and upper(paciente.nm_paciente) NOT like ('RN%')
+              CAST(a.dt_alta AS TIMESTAMP)                                        AS "data_saida_alta",
+              p.nm_paciente                                                       AS "name",
+              p.email                                                             AS "email",
+              (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
+              p.nr_cpf                                                            AS "cpf",
+              'Hospital Anchieta'                                                 AS "unidade",
 
-                UNION ALL
+              CASE
+                  WHEN a.tp_atendimento = 'A' AND s.cd_setor = 637 THEN 'ONCOLOGIA'
+                  WHEN a.tp_atendimento = 'U' THEN 'PRONTO_SOCORRO_GERAL'
+                  WHEN a.tp_atendimento = 'I' THEN 'INTERNACAO'
+                  WHEN a.tp_atendimento = 'E' THEN 'EXAMES'
+                  WHEN a.tp_atendimento = 'A' THEN 'AMBULATORIO'
+                  ELSE a.tp_atendimento
+              END                                                                 AS "area_pesquisa",
 
-                --AMBULATORIO SEM ONCOLOGIA
-                select 40094 ID_FOCUS,
-                      CAST(dbamv.fnc_mv_recupera_data_hora(ATENDIME.DT_ATENDIMENTO, atendime.hr_atendimento) AS TIMESTAMP) "data_atendimento",
-                      CAST(ATENDIME.DT_ALTA AS TIMESTAMP) AS "data_saida_alta",
-                      paciente.nm_paciente "name", paciente.email "email",
-                      (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
-                      paciente.NR_CPF AS "cpf",
-                      'Hospital Anchieta' AS "unidade",
-                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO_SOCORRO_GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
-                      SETOR.NM_SETOR "setor",
-                      ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
-                      'AMBULATORIO' EXTRA_INF_SETOR, PRESTADOR.NM_PRESTADOR "medico", PACIENTE.CD_PACIENTE "ID_EXTERNO_PACIENTE", ATENDIME.CD_ATENDIMENTO
-                  from dbamv.atendime, dbamv.paciente, dbamv.setor, dbamv.ori_ate, DBAMV.ESPECIALID, DBAMV.PRESTADOR
-                WHERE paciente.cd_paciente = atendime.cd_paciente
-                  AND SETOR.CD_SETOR = ORI_ATE.CD_SETOR
-                  AND ORI_ATE.CD_ORI_ATE = ATENDIME.CD_ORI_ATE
-                  AND ATENDIME.CD_ESPECIALID = ESPECIALID.CD_ESPECIALID
-                  AND PRESTADOR.CD_PRESTADOR = ATENDIME.CD_PRESTADOR
-                  and trunc(DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-                  AND TP_ATENDIMENTO = 'A'
-                  and upper(paciente.email) not like ('%NAO%')
-                  AND SETOR.CD_SETOR <> 637
+              CASE
+                  WHEN a.tp_atendimento = 'I' THEN ui.ds_unid_int
+                  ELSE s.nm_setor
+              END                                                                 AS "setor",
 
-                UNION ALL
+              pr.nm_prestador                                                     AS "medico",
+              a.cd_atendimento													AS "cd_atendimento"
 
-                --AMBULATÓRIO SÓ ONCOLOGIA
-                select 40094 ID_FOCUS,
-                      CAST(dbamv.fnc_mv_recupera_data_hora(ATENDIME.DT_ATENDIMENTO, atendime.hr_atendimento) AS TIMESTAMP) "data_atendimento",
-                      CAST(ATENDIME.DT_ALTA AS TIMESTAMP) AS "data_saida_alta", -- CORRIGIDO: Coluna na posição correta
-                      paciente.nm_paciente "name", paciente.email "email",
-                      (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
-                      paciente.NR_CPF AS "cpf",
-                      'Hospital Anchieta' AS "unidade",
-                      'ONCOLOGIA' "area_pesquisa", -- CORRIGIDO: Coluna na posição correta
-                      SETOR.NM_SETOR "setor",
-                      ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
-                      'AMBULATORIO' EXTRA_INF_SETOR, PRESTADOR.NM_PRESTADOR "medico", PACIENTE.CD_PACIENTE "ID_EXTERNO_PACIENTE", ATENDIME.CD_ATENDIMENTO
-                from dbamv.atendime, dbamv.paciente, dbamv.setor, dbamv.ori_ate, DBAMV.ESPECIALID, DBAMV.PRESTADOR
-                WHERE paciente.cd_paciente = atendime.cd_paciente
-                  AND SETOR.CD_SETOR = ORI_ATE.CD_SETOR
-                  AND ORI_ATE.CD_ORI_ATE = ATENDIME.CD_ORI_ATE
-                  AND ATENDIME.CD_ESPECIALID = ESPECIALID.CD_ESPECIALID
-                  AND PRESTADOR.CD_PRESTADOR = ATENDIME.CD_PRESTADOR
-                  and trunc(DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-                  AND TP_ATENDIMENTO = 'A'
-                  and upper(paciente.email) not like ('%NAO%')
-                  AND SETOR.CD_SETOR = 637
+          FROM dbamv.atendime a
+          JOIN dbamv.paciente p               ON p.cd_paciente = a.cd_paciente
+          JOIN dbamv.ori_ate oa               ON oa.cd_ori_ate = a.cd_ori_ate
+          JOIN dbamv.setor s                  ON s.cd_setor = oa.cd_setor
+          JOIN dbamv.especialid e             ON e.cd_especialid = a.cd_especialid
+          JOIN dbamv.prestador pr             ON pr.cd_prestador = a.cd_prestador
+          LEFT JOIN dbamv.mot_alt ma          ON ma.cd_mot_alt = a.cd_mot_alt
+          LEFT JOIN dbamv.leito l             ON l.cd_leito = a.cd_leito
+          LEFT JOIN dbamv.unid_int ui         ON l.cd_unid_int = ui.cd_unid_int
+          LEFT JOIN (
+              SELECT
+                  cd_atendimento,
+                  LISTAGG(ds_unid_int, ' / ') WITHIN GROUP (ORDER BY ds_unid_int) AS unidades_pac
+              FROM (
+                  SELECT DISTINCT
+                      mov_int.cd_atendimento,
+                      unid_int.ds_unid_int
+                  FROM dbamv.mov_int
+                  JOIN dbamv.leito ON leito.cd_leito = mov_int.cd_leito
+                  JOIN dbamv.unid_int ON leito.cd_unid_int = unid_int.cd_unid_int
+                  WHERE mov_int.cd_atendimento IS NOT NULL
+              )
+              GROUP BY cd_atendimento
+          ) spc  ON spc.cd_atendimento = a.cd_atendimento
 
-                UNION ALL
-
-                select 40094 ID_FOCUS,
-                      CAST(dbamv.fnc_mv_recupera_data_hora(ATENDIME.DT_ATENDIMENTO, atendime.hr_atendimento) AS TIMESTAMP) "data_atendimento",
-                      CAST(ATENDIME.DT_ALTA AS TIMESTAMP) AS "data_saida_alta",
-                      paciente.nm_paciente "name", paciente.email "email",
-                      (NVL(paciente.NR_DDI_CELULAR, '55') || NVL(paciente.NR_DDD_CELULAR, '') || NVL(paciente.NR_CELULAR, '')) AS "phone",
-                      paciente.NR_CPF AS "cpf",
-                      'Hospital Anchieta' AS "unidade",
-                      DECODE(ATENDIME.TP_ATENDIMENTO,'U','PRONTO_SOCORRO_GERAL','I','INTERNACAO','E','EXAMES','A','AMBULATORIO') "area_pesquisa",
-                      SETOR.NM_SETOR "setor",
-                      ESPECIALID.DS_ESPECIALID "especialidade", NULL "SEGMENTACAO 3", NULL "SEGMENTACAO 4", NULL "SEGMENTACAO 5",
-                      'EXAMES' EXTRA_INF_SETOR, PRESTADOR.NM_PRESTADOR "medico", PACIENTE.CD_PACIENTE "ID_EXTERNO_PACIENTE", ATENDIME.CD_ATENDIMENTO
-                  from dbamv.atendime, dbamv.paciente, dbamv.setor, dbamv.ori_ate, DBAMV.ESPECIALID, DBAMV.PRESTADOR
-                WHERE paciente.cd_paciente = atendime.cd_paciente
-                  AND SETOR.CD_SETOR = ORI_ATE.CD_SETOR
-                  AND ORI_ATE.CD_ORI_ATE = ATENDIME.CD_ORI_ATE
-                  AND ATENDIME.CD_ESPECIALID = ESPECIALID.CD_ESPECIALID
-                  AND PRESTADOR.CD_PRESTADOR = ATENDIME.CD_PRESTADOR
-                  and trunc(DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-                    AND TP_ATENDIMENTO = 'E'
-                  and upper(paciente.email) not like ('%NAO%')
-                
-
+          WHERE
+              UPPER(p.email) NOT LIKE '%NAO%'
+              AND (
+                  -- Regra 1: Pronto Socorro (U)
+                  (a.tp_atendimento = 'U' AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) AND NVL(a.cd_tip_res, 0) NOT IN (6, 5, 8, 17, 13, 14))
+                  -- Regra 2: Internação (I)
+                  OR (a.tp_atendimento = 'I' AND TRUNC(a.dt_alta) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) AND ma.tp_mot_alta <> 'O' AND UPPER(p.nm_paciente) NOT LIKE 'RN%')
+                  -- Regra 3: Ambulatório SEM Oncologia (A)
+                  OR (a.tp_atendimento = 'A' AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) AND s.cd_setor <> 637)
+                  -- Regra 4: Ambulatório SÓ Oncologia (A)
+                  OR (a.tp_atendimento = 'A' AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) AND s.cd_setor = 637)
+                  -- Regra 5: Exames (E)
+                  OR (a.tp_atendimento = 'E' AND TRUNC(a.dt_atendimento) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+              ))
         """
 
         cursor.execute(SQL, {'data': data})

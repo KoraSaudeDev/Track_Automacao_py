@@ -12,9 +12,9 @@ from app.scheduler import automations
 def start_all():
     hospitals = ['HMS','HMC','HPC',
                  'HMSM','HMV','HSL',
-                 'HSF','OTO_ING',
-                 'HAT','HAC','HPM_HST',
-                 'HSMC']
+                 'HSF','OTOA','OTOSD', 
+                 'OTOM','OTOS','HAT',
+                 'HAC','HPM_HST','HSMC']
 
     for autom in hospitals:
         automations.start(autom)

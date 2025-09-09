@@ -65,7 +65,8 @@ def DB():
         print(f"[{datetime.now()}] Erro ao aplicar a  query {__name__}: {e}")
         return None
     finally:
-        if cursor and conn:
+        if cursor:
             cursor.close()
+        if conn:
             conn.close()
 

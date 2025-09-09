@@ -8,7 +8,7 @@ def create_app():
     app = Flask(__name__)
     
     #start_all_teste()
-    #start_all()
+    start_all()
 
     app.register_blueprint(track_bp)
     

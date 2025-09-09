@@ -28,10 +28,6 @@ def DB():
                 'PRONTO SOCORRO GERAL' AS "area_pesquisa",
 				CASE
 			        WHEN M.CD_MULTI_EMPRESA IN (8, 19, 23, 25) THEN 'Hospital Oto Santos Dumont'
-			        WHEN M.CD_MULTI_EMPRESA IN (1, 2, 3, 6, 7, 12, 13, 16, 26) THEN 'Hospital Oto Aldeota'
-			        WHEN M.CD_MULTI_EMPRESA IN (18) THEN 'Hospital Oto Meireles'
-			        WHEN M.CD_MULTI_EMPRESA IN (10, 11) THEN 'Hospital Oto Sul'
-			        WHEN M.CD_MULTI_EMPRESA IN (20, 21, 22) THEN 'Instituto De Neurologia De Goiania'
 			        ELSE M.DS_RAZAO_SOCIAL
 			    END AS "unidade",
                 CASE 
@@ -49,6 +45,7 @@ def DB():
                 AND NOT EXISTS (
                     SELECT 1 FROM DBAMV.TIP_RES TP WHERE TP.CD_TIP_RES = A.CD_TIP_RES AND TP.SN_OBITO = 'S'
                 )
+                AND M.CD_MULTI_EMPRESA IN (8, 19, 23, 25) 
 
             UNION ALL
 
@@ -69,10 +66,6 @@ def DB():
                 END AS "area_pesquisa",
 				CASE
 			        WHEN M.CD_MULTI_EMPRESA IN (8, 19, 23, 25) THEN 'Hospital Oto Santos Dumont'
-			        WHEN M.CD_MULTI_EMPRESA IN (1, 2, 3, 6, 7, 12, 13, 16, 26) THEN 'Hospital Oto Aldeota'
-			        WHEN M.CD_MULTI_EMPRESA IN (18) THEN 'Hospital Oto Meireles'
-			        WHEN M.CD_MULTI_EMPRESA IN (10, 11) THEN 'Hospital Oto Sul'
-			        WHEN M.CD_MULTI_EMPRESA IN (20, 21, 22) THEN 'Instituto De Neurologia De Goiania'
 			        ELSE M.DS_RAZAO_SOCIAL
 			    END AS "unidade",
                 CASE
@@ -95,6 +88,7 @@ def DB():
                         AND NOT EXISTS (SELECT 1 FROM DBAMV.MOT_ALT MA WHERE MA.CD_MOT_ALT = A.CD_MOT_ALT AND MA.TP_MOT_ALTA = 'O')
                     )
                 )
+                AND M.CD_MULTI_EMPRESA IN (8, 19, 23, 25) 
 
             UNION ALL
 
@@ -112,26 +106,32 @@ def DB():
                 'EXAMES' AS "area_pesquisa",
 				CASE
 			        WHEN M.CD_MULTI_EMPRESA IN (8, 19, 23, 25) THEN 'Hospital Oto Santos Dumont'
-			        WHEN M.CD_MULTI_EMPRESA IN (1, 2, 3, 6, 7, 12, 13, 16, 26) THEN 'Hospital Oto Aldeota'
-			        WHEN M.CD_MULTI_EMPRESA IN (18) THEN 'Hospital Oto Meireles'
-			        WHEN M.CD_MULTI_EMPRESA IN (10, 11) THEN 'Hospital Oto Sul'
-			        WHEN M.CD_MULTI_EMPRESA IN (20, 21, 22) THEN 'Instituto De Neurologia De Goiania'
 			        ELSE M.DS_RAZAO_SOCIAL
 			    END AS "unidade",
                 CASE
                     WHEN A.CD_ORI_ATE = 103 THEN 'HEMODINAMICA'
-                    WHEN A.CD_ORI_ATE IN (47, 22, 104, 106, 109) THEN 'IMAGEM'
-                    WHEN A.CD_ORI_ATE = 16 THEN 'LABORATORIO'
+                    WHEN A.CD_ORI_ATE IN (47, 22, 104, 106, 109, 19, 38, 121, 123, 21) THEN 'IMAGEM'
+                    WHEN A.CD_ORI_ATE IN (13,14,16,37,35,50,88,112,125,126) THEN 'LABORATORIO'
                     WHEN A.CD_ORI_ATE IN (29, 110, 100) THEN 'ENDOSCOPIA'
                 END AS "setor"
             FROM DBAMV.ATENDIME A
             INNER JOIN DBAMV.PACIENTE P ON A.CD_PACIENTE = P.CD_PACIENTE
             INNER JOIN DBAMV.MULTI_EMPRESAS M ON A.CD_MULTI_EMPRESA = M.CD_MULTI_EMPRESA
-            INNER JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR
-            WHERE
-                A.TP_ATENDIMENTO = 'E'
-                AND A.CD_ORI_ATE IN (13, 14, 16, 19, 21, 22, 29, 35, 37, 38, 47, 50, 88, 100, 103, 104, 106, 109, 110, 112, 121, 123, 125, 126)
+            LEFT JOIN DBAMV.PRESTADOR PR ON A.CD_PRESTADOR = PR.CD_PRESTADOR            
+			WHERE
+			    A.TP_ATENDIMENTO = 'E'
+			    AND A.CD_ORI_ATE IN (
+			        -- HEMODINAMICA
+			        103,
+			        -- IMAGEM
+			        19, 21, 22, 38, 47, 104, 106, 109, 121, 123,
+			        -- LABORATORIO
+			        13, 14, 16, 35, 37, 50, 88, 112, 125, 126,
+			        -- ENDOSCOPIA
+			        29, 100, 110
+			    )
                 AND TRUNC(A.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
+                AND M.CD_MULTI_EMPRESA IN (8, 19, 23, 25) 
 
             UNION ALL
 
@@ -149,10 +149,6 @@ def DB():
                 'AMBULATORIO' AS "area_pesquisa",
 				CASE
 			        WHEN M.CD_MULTI_EMPRESA IN (8, 19, 23, 25) THEN 'Hospital Oto Santos Dumont'
-			        WHEN M.CD_MULTI_EMPRESA IN (1, 2, 3, 6, 7, 12, 13, 16, 26) THEN 'Hospital Oto Aldeota'
-			        WHEN M.CD_MULTI_EMPRESA IN (18) THEN 'Hospital Oto Meireles'
-			        WHEN M.CD_MULTI_EMPRESA IN (10, 11) THEN 'Hospital Oto Sul'
-			        WHEN M.CD_MULTI_EMPRESA IN (20, 21, 22) THEN 'Instituto De Neurologia De Goiania'
 			        ELSE M.DS_RAZAO_SOCIAL
 			    END AS "unidade",
                 CASE
@@ -167,7 +163,7 @@ def DB():
             WHERE
                 A.TP_ATENDIMENTO = 'A'
                 AND TRUNC(A.DT_ATENDIMENTO) = TRUNC(TO_TIMESTAMP(:data,'YYYY-MM-DD HH24:MI:SS.FF3'))
-
+				AND M.CD_MULTI_EMPRESA IN (8, 19, 23, 25) 
             ORDER BY
                 "unidade",
                 "setor",
@@ -189,6 +185,7 @@ def DB():
         print(f"[{datetime.now()}] Erro ao aplicar a  query {__name__}: {e}")
         return None
     finally:
-        if cursor and conn:
+        if cursor:
             cursor.close()
+        if conn:
             conn.close()

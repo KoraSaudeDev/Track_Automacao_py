@@ -65,29 +65,22 @@ def data_search(hospital,teste=None):
 
 def start(hospital):
 
-    data = data_search(hospital=hospital)
-    if data is None or len(data) == 0:
-        logging.warning(f"[{datetime.now()}] - Sem dados para {hospital}")
-        return
     template = get_template(hospital)
-
-    schedulers.start_schedulers(data=data["ambulatorio"],template=template)
-    schedulers.start_schedulers(data=data["exames"],template=template)
-    schedulers.start_schedulers(data=data["internacao"],template=template)
-    schedulers.start_schedulers(data=data["maternidade"],template=template)
-    schedulers.start_schedulers(data=data["pronto_socorro"],template=template)
-    schedulers.start_schedulers(data=data["oncologia"],template=template)
+    schedulers.start_schedulers(hospital=hospital, area="ambulatorio", template=template)
+    schedulers.start_schedulers(hospital=hospital, area="exames", template=template)
+    schedulers.start_schedulers(hospital=hospital, area="internacao", template=template)
+    schedulers.start_schedulers(hospital=hospital, area="maternidade", template=template)
+    schedulers.start_schedulers(hospital=hospital, area="pronto_socorro", template=template)
+    schedulers.start_schedulers(hospital=hospital, area="oncologia", template=template)
 
 def start_teste(hospital=None):
     template = get_template(hospital)
-    data = data_search(hospital=hospital,teste=hospital)
-   
-    schedulers.start_schedulers(data=data["ambulatorio"],template=template)
-    schedulers.start_schedulers(data=data["exames"],template=template)
-    schedulers.start_schedulers(data=data["internacao"],template=template)
-    schedulers.start_schedulers(data=data["maternidade"],template=template)
-    schedulers.start_schedulers(data=data["pronto_socorro"],template=template)
-    schedulers.start_schedulers(data=data["oncologia"],template=template)
+    schedulers.start_schedulers(hospital=hospital, area="ambulatorio", template=template, teste=hospital)
+    schedulers.start_schedulers(hospital=hospital, area="exames", template=template, teste=hospital)
+    schedulers.start_schedulers(hospital=hospital, area="internacao", template=template, teste=hospital)
+    schedulers.start_schedulers(hospital=hospital, area="maternidade", template=template, teste=hospital)
+    schedulers.start_schedulers(hospital=hospital, area="pronto_socorro", template=template, teste=hospital)
+    schedulers.start_schedulers(hospital=hospital, area="oncologia", template=template, teste=hospital)
 
 
    

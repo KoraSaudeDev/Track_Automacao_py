@@ -17,21 +17,31 @@ def send_teste(data, survey_uuid):
     track_api.postImportLines(survey_uuid,data)
 
 def schedule_task(task_func):
-    scheduler.add_job(task_func, 'interval', days=1)
-    #scheduler.add_job(task_func,'interval',seconds=60)
+    #scheduler.add_job(task_func, 'interval', days=1)
+    scheduler.add_job(task_func,'interval',seconds=60)
     
-def start_schedulers(data,template=None):
-    if(data == None or len(data) == 0):
-        logging.warning(f"[{datetime.now()}] - sem dados")
-        return
-    survey_uuid = data[0]['uuid']
-    #schedule_task(lambda: send_email(data, survey_uuid,template))
-    #schedule_task(lambda: send_teste([data[0]], survey_uuid))
+def start_schedulers(hospital, area, template=None, teste=None):
+    # A cada execução, buscar dados atualizados do banco
+    def task_wrapper():
+        try:
+            from app.scheduler.automations import data_search
+            fresh = data_search(hospital=hospital, teste=teste)
+            if not fresh or area not in fresh:
+                logging.warning(f"[{datetime.now()}] - {hospital} - {area} - sem dados")
+                return
+            data = fresh[area]
+            if not data:
+                logging.warning(f"[{datetime.now()}] - {hospital} - {area} - sem dados")
+                return
+            survey_uuid = data[0]['uuid']
+            send_email(data, survey_uuid, template)
+        except Exception as e:
+            logging.error(f"[{datetime.now()}] - Erro ao executar tarefa {hospital} - {area}: {e}")
 
-    #print(data[0])
-    
-    logging.warning(f"[{datetime.now()}] - {data[0]['unidade']} - {data[0]['area_pesquisa']}  - Disparo agendado!")
-    print(f"{data[0]['unidade']} - {data[0]['area_pesquisa']} -  schedulers iniciado")
+    schedule_task(task_wrapper)
+
+    logging.warning(f"[{datetime.now()}] - {hospital} - {area} - Disparo agendado!")
+    print(f"{hospital} - {area} -  schedulers iniciado")
     if not scheduler.running:
         scheduler.start()
     else:

@@ -1,7 +1,7 @@
 from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
 from app.db.querys_mv.ING_OTO import OTOA, OTOSD, OTOM, OTOS,ING
 from app.db.querys_mv import HAT
-from app.db.querys_tasy import HAC,HPM_HST,HSMC
+from app.db.querys_tasy import HAC,HPM_HST,HSMC,ENCORE
 import app.db.teste as teste
 
 def get_survey_uuid(hospital):
@@ -164,7 +164,8 @@ def get_hospital():
         "OTOSD": OTOSD, 
         "OTOM": OTOM,
         "OTOS": OTOS,
-        "ING": ING
+        "ING": ING,
+        "ENCORE":ENCORE 
 
     }
     return hospitais

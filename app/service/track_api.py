@@ -20,7 +20,7 @@ def postDistribution(survey_uuid,distribution_channel,import_lines,template=None
         "distribution_channel":"email",
         "reminder_channel":"whatsapp",
         "validity_at":get_dates_reminder(14),
-        "reminder_at":get_dates_reminder(2),
+        "reminder_at":get_dates_reminder(8),
         "import_lines":import_lines,
         "template_invite_hash":template["template_invite_hash"], #Convite  
         "template_expired_hash":template["template_expired_hash"],#Pesquisa expirada

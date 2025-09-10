@@ -15,10 +15,11 @@ def DB():
         data     = get_filtered_dates()[0]
 
         SQL = """
-                SELECT 
+            SELECT 
                 '40085' AS id_cliente,
                 a.DT_ENTRADA AS "data_atendimento",
                 a.DT_ALTA AS "data_saida_alta",
+                a.NR_ATENDIMENTO AS "cd_atendimento",
                 a.NM_MEDICO AS "medico",
                 a.NM_PACIENTE as "name",
                 b.DS_EMAIL_CCIH AS "email",
@@ -51,6 +52,7 @@ def DB():
                 '40085' AS id_cliente,
                 a.DT_ENTRADA AS "data_atendimento",
                 a.DT_ALTA AS "data_saida_alta",
+                a.NR_ATENDIMENTO AS "cd_atendimento",
                 a.NM_MEDICO AS "medico",
                 a.NM_PACIENTE as "name",
                 b.DS_EMAIL_CCIH AS "email",
@@ -74,6 +76,7 @@ def DB():
                 '40085' AS id_cliente,
                 a.DT_ENTRADA AS "data_atendimento",
                 a.DT_ALTA AS "data_saida_alta",
+                a.NR_ATENDIMENTO AS "cd_atendimento",
                 a.NM_MEDICO AS "medico",
                 a.NM_PACIENTE as "name",
                 b.DS_EMAIL_CCIH AS "email",
@@ -97,6 +100,7 @@ def DB():
                 '40085' AS id_cliente,
                 a.DT_ENTRADA AS "data_atendimento",
                 a.DT_ALTA AS "data_saida_alta",
+                a.NR_ATENDIMENTO AS "cd_atendimento",
                 a.NM_MEDICO AS "medico",
                 a.NM_PACIENTE as "name",
                 b.DS_EMAIL_CCIH AS "email",

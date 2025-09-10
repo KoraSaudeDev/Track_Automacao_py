@@ -17,9 +17,9 @@ def DB():
         SQL = """
         -- HFOCUS SEGMENTADO (NPS)--
             select '40085' as ID_Cliente_Hfocus, 
-            a.nr_atendimento,
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
+            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
             b.DS_EMAIL_CCIH AS "email",
@@ -51,9 +51,9 @@ def DB():
             -----Maternidade----------------------------
             UNION ALL
             select '40085' as ID_Cliente_Hfocus, 
-            a.nr_atendimento,
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
+            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
             b.DS_EMAIL_CCIH AS "email",
@@ -84,9 +84,9 @@ def DB():
             UNION ALL
             
             select '40085' as ID_Cliente_Hfocus, 
-            a.nr_atendimento,
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
+            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
             b.DS_EMAIL_CCIH AS "email",
@@ -111,9 +111,9 @@ def DB():
             UNION ALL 
             
             select '40085' as ID_Cliente_Hfocus, 
-            a.nr_atendimento,
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
+            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
             b.DS_EMAIL_CCIH AS "email",
@@ -140,9 +140,9 @@ def DB():
             UNION ALL 
             
             select '40085' as ID_Cliente_Hfocus, 
-            a.nr_atendimento,
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
+            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
             b.DS_EMAIL_CCIH AS "email",

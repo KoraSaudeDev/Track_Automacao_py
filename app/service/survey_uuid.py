@@ -1,5 +1,5 @@
 from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
-from app.db.querys_mv.ING_OTO import OTOA, OTOSD, OTOM, OTOS
+from app.db.querys_mv.ING_OTO import OTOA, OTOSD, OTOM, OTOS,ING
 from app.db.querys_mv import HAT
 from app.db.querys_tasy import HAC,HPM_HST,HSMC
 import app.db.teste as teste
@@ -126,6 +126,16 @@ def get_survey_uuid(hospital):
             "oncologia": None,
             "maternidade":None
         }
+    
+    elif hospital == 'ING':
+        return {
+            "internacao": "234239f5-cdaa-4db8-8bd2-f45e290fa896",
+            "ambulatorio": "a8135a20-c59d-4f95-b923-38c69a0f9d99",
+            "exames": "26f128f8-769c-416f-b6c0-1747d04129e6",
+            "oncologia": "72cca428-0dda-4a9b-b231-d5a65f877c26",
+            "pronto_socorro": "383fb6ab-bf3a-4b47-9874-9a07bdfe7cf9",
+            "maternidade": "2b84ca2e-c4e3-445d-b485-b9492d31855c"
+        }
 
     else:
         return {
@@ -153,7 +163,9 @@ def get_hospital():
         "OTOA": OTOA,
         "OTOSD": OTOSD, 
         "OTOM": OTOM,
-        "OTOS": OTOS
+        "OTOS": OTOS,
+        "ING": ING
+
     }
     return hospitais
     

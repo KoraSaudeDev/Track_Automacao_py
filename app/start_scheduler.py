@@ -14,7 +14,8 @@ def start_all():
                  'HMSM','HMV','HSL',
                  'HSF','OTOA','OTOSD', 
                  'OTOM','OTOS','HAT',
-                 'HAC','HPM_HST','HSMC']
+                 'HAC','HPM_HST','HSMC'
+                 "ING"]
 
     for autom in hospitals:
         automations.start(autom)

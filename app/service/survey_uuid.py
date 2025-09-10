@@ -185,4 +185,20 @@ def get_template(hospital):
             "wpp_name":"templatemeridional",
             "id_provider":"HXe9f93f4a14efe94040ed057d46c12e42"
         }
+    elif hospital in ["OTOA", "OTOSD", "OTOM", "OTOS"]:
+        return {
+            "template_invite_hash":"5YpcLj",   
+            "template_expired_hash":"Lm1Alr",
+            "template_thanks_hash":"GKza0K",
+            "wpp_name":None,
+            "id_provider":None
+        }
+    elif hospital in ['ING']:
+        return {
+            "template_invite_hash":"SQq3Dz",   
+            "template_expired_hash":"nCV90X",
+            "template_thanks_hash":"d7cv2m",
+            "wpp_name":None,
+            "id_provider":None
+        }
 

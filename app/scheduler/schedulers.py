@@ -18,30 +18,37 @@ def send_teste(data, survey_uuid):
 
 def schedule_task(task_func):
     #scheduler.add_job(task_func, 'interval', days=1)
-    scheduler.add_job(task_func,'interval',seconds=60)
+    scheduler.add_job(task_func,'interval',seconds=120)
     
-def start_schedulers(hospital, area, template=None, teste=None):
-    # A cada execução, buscar dados atualizados do banco
+def start_hospital_scheduler(hospital, template=None, teste=None):
     def task_wrapper():
         try:
             from app.scheduler.automations import data_search
             fresh = data_search(hospital=hospital, teste=teste)
-            if not fresh or area not in fresh:
-                logging.warning(f"[{datetime.now()}] - {hospital} - {area} - sem dados")
+            if not fresh:
+                logging.warning(f"[{datetime.now()}] - {hospital} - sem dados")
                 return
-            data = fresh[area]
-            if not data:
-                logging.warning(f"[{datetime.now()}] - {hospital} - {area} - sem dados")
-                return
-            survey_uuid = data[0]['uuid']
-            send_email(data, survey_uuid, template)
+            for area in [
+                "ambulatorio",
+                "exames",
+                "internacao",
+                "maternidade",
+                "pronto_socorro",
+                "oncologia",
+            ]:
+                data = fresh.get(area) if isinstance(fresh, dict) else None
+                if not data:
+                    continue
+                survey_uuid = data[0]['uuid']
+                send_email(data, survey_uuid, template)
+                print(f"{hospital} - {area} - Disparo agendado!")
         except Exception as e:
-            logging.error(f"[{datetime.now()}] - Erro ao executar tarefa {hospital} - {area}: {e}")
+            logging.error(f"[{datetime.now()}] - Erro ao executar tarefa do hospital {hospital}: {e}")
 
     schedule_task(task_wrapper)
 
-    logging.warning(f"[{datetime.now()}] - {hospital} - {area} - Disparo agendado!")
-    print(f"{hospital} - {area} -  schedulers iniciado")
+    logging.warning(f"[{datetime.now()}] - {hospital} - Disparo único por hospital agendado!")
+    print(f"{hospital} - schedulers (único por hospital) iniciado")
     if not scheduler.running:
         scheduler.start()
     else:

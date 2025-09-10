@@ -64,24 +64,9 @@ def data_search(hospital,teste=None):
 
 
 def start(hospital):
-
     template = get_template(hospital)
-    schedulers.start_schedulers(hospital=hospital, area="ambulatorio", template=template)
-    schedulers.start_schedulers(hospital=hospital, area="exames", template=template)
-    schedulers.start_schedulers(hospital=hospital, area="internacao", template=template)
-    schedulers.start_schedulers(hospital=hospital, area="maternidade", template=template)
-    schedulers.start_schedulers(hospital=hospital, area="pronto_socorro", template=template)
-    schedulers.start_schedulers(hospital=hospital, area="oncologia", template=template)
+    schedulers.start_hospital_scheduler(hospital=hospital, template=template)
 
 def start_teste(hospital=None):
     template = get_template(hospital)
-    schedulers.start_schedulers(hospital=hospital, area="ambulatorio", template=template, teste=hospital)
-    schedulers.start_schedulers(hospital=hospital, area="exames", template=template, teste=hospital)
-    schedulers.start_schedulers(hospital=hospital, area="internacao", template=template, teste=hospital)
-    schedulers.start_schedulers(hospital=hospital, area="maternidade", template=template, teste=hospital)
-    schedulers.start_schedulers(hospital=hospital, area="pronto_socorro", template=template, teste=hospital)
-    schedulers.start_schedulers(hospital=hospital, area="oncologia", template=template, teste=hospital)
-
-
-   
-    
+    schedulers.start_hospital_scheduler(hospital=hospital, template=template, teste=hospital)

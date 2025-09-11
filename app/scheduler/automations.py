@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
-from app.scheduler import schedulers
-from app.service.survey_uuid import get_survey_uuid,get_hospital,get_hospital_teste, get_template
+from app.service.survey_uuid import get_survey_uuid,get_hospital,get_hospital_teste
 
 
 
@@ -63,10 +62,3 @@ def data_search(hospital,teste=None):
     }
 
 
-def start(hospital):
-    template = get_template(hospital)
-    schedulers.start_hospital_scheduler(hospital=hospital, template=template)
-
-def start_teste(hospital=None):
-    template = get_template(hospital)
-    schedulers.start_hospital_scheduler(hospital=hospital, template=template, teste=hospital)

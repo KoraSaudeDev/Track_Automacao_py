@@ -1,4 +1,6 @@
 from app.scheduler import automations
+from app.scheduler import schedulers
+
 
 #HUB ES:
 #HMS - MERIDIONAL SERRA
@@ -10,15 +12,18 @@ from app.scheduler import automations
 #HMSM - MERIDIONAL SÃO MATEUS
 
 def start_all():
+    #hub_es = ['HMS','HMC','HPC','HMV','HSF','HSL','HMSM']
+    #ign_oto = ['OTOA', 'OTOSD', 'OTOM', 'OTOS',"ING",]
+    #ign_outros = ['HAT','HAC','HPM_HST','HSMC',"ENCORE"]
+    
     hospitals = ['HMS','HMC','HPC',
                  'HMSM','HMV','HSL',
                  'HSF','OTOA','OTOSD', 
                  'OTOM','OTOS','HAT',
-                 'HAC','HPM_HST','HSMC'
+                 'HAC','HPM_HST','HSMC',
                  "ING","ENCORE"]
 
-    for autom in hospitals:
-        automations.start(autom)
+    schedulers.schedule_task(hospital=hospitals)
 
 def start_all_teste():
     hospitals = ['HMS','HMC']

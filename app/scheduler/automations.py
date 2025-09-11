@@ -23,7 +23,7 @@ def data_search(hospital,teste=None):
     data_list = dbHospital.DB()
     
     if teste is not None:
-        dbHospital_teste = get_hospital_teste().get(teste)
+        dbHospital_teste = get_hospital_teste().get(hospital)
         if dbHospital_teste is None:
             logging.warning(f"[{datetime.now()}] - Hospital de teste {teste} não encontrado.")
             return None

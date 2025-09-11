@@ -27,7 +27,5 @@ def start_all():
 
 def start_all_teste():
     hospitals = ['HMS','HMC']
-
-    for autom in hospitals:
-        automations.start_teste(autom)
+    schedulers.schedule_task(hospital=hospitals,teste=hospitals)
 

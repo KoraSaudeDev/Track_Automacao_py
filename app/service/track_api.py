@@ -19,7 +19,7 @@ def postDistribution(survey_uuid,distribution_channel,import_lines,template=None
         "survey_uuid":survey_uuid,
         "distribution_channel":"email",
         "reminder_channel":"whatsapp",
-        "validity_at":get_dates_reminder(14),
+        "validity_at":get_dates_reminder(15),
         "reminder_at":get_dates_reminder(8),
         "import_lines":import_lines,
         "template_invite_hash":template["template_invite_hash"], #Convite  

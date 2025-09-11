@@ -46,8 +46,8 @@ def start_hospital_scheduler(hospital, template=None, teste=None):
                     if not data:
                         continue
                     survey_uuid = data[0]['uuid']
-                    #send_email(data, survey_uuid, template)
-                    print(f"{h} - {area} - {survey_uuid} - Disparo agendado!")
+                    send_email(data, survey_uuid, template)
+                    #print(f"{h} - {area} - {survey_uuid} - Disparo agendado!")
         except Exception as e:
             logging.error(f"[{datetime.now()}] - Erro ao executar tarefa do hospital {h}: {e}")
 
@@ -55,7 +55,7 @@ def start_hospital_scheduler(hospital, template=None, teste=None):
 
 def schedule_task(hospital, template=None, teste=None):
     #scheduler.add_job(task_func, 'interval', days=1)
-    scheduler.add_job(start_hospital_scheduler,'interval',seconds=600,kwargs={"hospital":hospital,"template":template,"teste":teste})
+    scheduler.add_job(start_hospital_scheduler,'interval',days=1,kwargs={"hospital":hospital,"template":template,"teste":teste})
     if not scheduler.running:
         scheduler.start()
     else:

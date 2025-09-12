@@ -16,155 +16,208 @@ def DB():
 
         SQL = """
         -- HFOCUS SEGMENTADO (NPS)--
-            select '40085' as ID_Cliente_Hfocus, 
+
+        -- Bloco 1: INTERNACAO
+        select
+            '40085' as ID_Cliente_Hfocus,
+            a.nr_atendimento AS "cd_atendimento",
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
-            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
-            b.DS_EMAIL_CCIH AS "email",
-            (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+            UPPER(tasy.obter_compl_pf(a.CD_PESSOA_FISICA, 1, 'M')) AS "email",
+            '55' || B.nr_ddd_celular || B.nr_telefone_celular AS "phone",
             a.NR_CPF as "cpf",
-            'INTERNACAO' "area_pesquisa",
+            'INTERNACAO' AS "area_pesquisa",
             'Hospital São Francisco DF' AS "unidade",
             'INTERNACAO' AS "setor"
-            
-            from 
-            TASY.atendimento_paciente_v a,
-            TASY.pessoa_fisica b,
-            TASY.SETOR_ATENDIMENTO c
-            
-            where 1 = 1
-            
-        
-            AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))    
-            
+        from
+            tasy.atendimento_paciente_v a,
+            tasy.pessoa_fisica b,
+            tasy.setor_atendimento c
+        where
+            1 = 1
             and a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
-            and A.ds_setor_internacao = C.DS_SETOR_ATENDIMENTO
-            AND A.IE_TIPO_ATENDIMENTO IN (1)
-            and a.dt_cancelamento is NULL
-            --AND b.IE_PERM_SMS_EMAIL = 'S'
-            and a.CD_MOTIVO_ALTA not in (7,16,30,21,26,27,28)
-            AND C.CD_SETOR_ATENDIMENTO <> 54
-                
-            
-            -----Maternidade----------------------------
-            UNION ALL
-            select '40085' as ID_Cliente_Hfocus, 
+            and a.ds_setor_internacao = c.DS_SETOR_ATENDIMENTO
+            AND TRUNC(a.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            AND a.DT_ALTA IS NOT NULL
+            AND a.IE_TIPO_ATENDIMENTO IN (1)
+            and a.dt_cancelamento is null
+            and a.CD_MOTIVO_ALTA not in (7, 16, 30, 21, 26, 27, 28)
+            AND c.CD_SETOR_ATENDIMENTO <> 54
+            --AND tasy.obter_DADOS_PF(A.CD_PESSOA_FISICA, 'I') >= 1
+        group by
+            a.nr_atendimento,
+            a.DT_ENTRADA,
+            a.DT_ALTA,
+            a.NM_MEDICO,
+            a.NM_PACIENTE,
+            a.CD_PESSOA_FISICA,
+            B.nr_ddd_celular,
+            B.nr_telefone_celular,
+            a.NR_CPF
+
+        ----- Bloco 2: Maternidade ----------------------------
+        UNION ALL
+
+        select
+            '40085' as ID_Cliente_Hfocus,
+            a.nr_atendimento AS "cd_atendimento",
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
-            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
-            b.DS_EMAIL_CCIH AS "email",
-            (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+            UPPER(tasy.obter_compl_pf(a.CD_PESSOA_FISICA, 1, 'M')) AS "email",
+            '55' || B.nr_ddd_celular || B.nr_telefone_celular AS "phone",
             a.NR_CPF as "cpf",
-            'MATERNIDADE' "area_pesquisa",
+            'MATERNIDADE' AS "area_pesquisa",
             'Hospital São Francisco DF' AS "unidade",
             'MATERNIDADE' AS "setor"
-            
-            from 
-            TASY.atendimento_paciente_v a,
-            TASY.pessoa_fisica b,
-            TASY.SETOR_ATENDIMENTO c
-            
-            where 1 = 1
-            
-            AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))    
+        from
+            tasy.atendimento_paciente_v a,
+            tasy.pessoa_fisica b,
+            tasy.setor_atendimento c
+        where
+            1 = 1
             and a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
-            and A.ds_setor_internacao = C.DS_SETOR_ATENDIMENTO
-            AND A.DT_ALTA IS NOT NULL
-            AND A.IE_TIPO_ATENDIMENTO IN (1)
+            and a.ds_setor_internacao = c.DS_SETOR_ATENDIMENTO
+            AND TRUNC(a.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            AND a.DT_ALTA IS NOT NULL
+            AND a.IE_TIPO_ATENDIMENTO IN (1)
             and a.dt_cancelamento is null
-            and a.CD_MOTIVO_ALTA not in (7,16,30,21,26,27,28)
-            AND C.CD_SETOR_ATENDIMENTO = 54
+            and a.CD_MOTIVO_ALTA not in (7, 16, 30, 21, 26, 27, 28)
+            AND c.CD_SETOR_ATendimento = 54
+            --AND tasy.obter_DADOS_PF(A.CD_PESSOA_FISICA, 'I') >= 1
+        group by
+            a.nr_atendimento,
+            a.DT_ENTRADA,
+            a.DT_ALTA,
+            a.NM_MEDICO,
+            a.NM_PACIENTE,
+            a.CD_PESSOA_FISICA,
+            B.nr_ddd_celular,
+            B.nr_telefone_celular,
+            a.NR_CPF
 
-            
-            ---PRONTO SOCORRO----
-            UNION ALL
-            
-            select '40085' as ID_Cliente_Hfocus, 
+        --- Bloco 3: PRONTO SOCORRO ----
+        UNION ALL
+
+        select
+            '40085' as ID_Cliente_Hfocus,
+            a.nr_atendimento AS "cd_atendimento",
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
-            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
-            b.DS_EMAIL_CCIH AS "email",
-            (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+            UPPER(tasy.obter_compl_pf(a.CD_PESSOA_FISICA, 1, 'M')) AS "email",
+            '55' || B.nr_ddd_celular || B.nr_telefone_celular AS "phone",
             a.NR_CPF as "cpf",
-            'PRONTO SOCORRO GERAL' as "area_pesquisa",
+            'PRONTO_SOCORRO_GERAL' as "area_pesquisa",
             'Hospital São Francisco DF' AS "unidade",
-            decode(A.IE_CLINICA,13,'PA_GINECOLOGICO',10,'PA_PEDIATRICO',4,'PA_PEDIATRICO','PA_ADULTO') AS "setor"
-            from 
-            TASY.atendimento_paciente_v a,
-            TASY.pessoa_fisica b
-            where 1 = 1
-            
-            AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-            and a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
-            AND A.DT_ALTA IS NOT NULL
-            AND A.IE_TIPO_ATENDIMENTO IN (3)
+            decode(a.IE_CLINICA, 13, 'PA_GINECOLOGICO', 10, 'PA_PEDIATRICO', 4, 'PA_PEDIATRICO', 'PA_ADULTO') AS "setor"
+        from
+            tasy.atendimento_paciente_v a,
+            tasy.pessoa_fisica b
+        where
+            1 = 1
+            and a.CD_PESSOA_FISICA = b.cd_pessoa_fisica 
+            AND TRUNC(a.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            AND a.DT_ALTA IS NOT NULL
+            AND a.IE_TIPO_ATENDIMENTO IN (3)
             and a.dt_cancelamento is null
-            and a.CD_MOTIVO_ALTA not in (7,16,30,21,26,27,28)
-            
-            --------ATENDIMENTO AMBULATORIAL------------
-            UNION ALL 
-            
-            select '40085' as ID_Cliente_Hfocus, 
+            and a.CD_MOTIVO_ALTA not in (7, 16, 30, 21, 26, 27, 28)
+        group by
+            a.nr_atendimento,
+            a.DT_ENTRADA,
+            a.DT_ALTA,
+            a.NM_MEDICO,
+            a.NM_PACIENTE,
+            a.CD_PESSOA_FISICA,
+            b.nr_ddd_celular,
+            b.nr_telefone_celular,
+            a.NR_CPF,
+            a.IE_CLINICA
+
+        -------- Bloco 4: ATENDIMENTO AMBULATORIAL ------------
+        UNION ALL
+
+        select
+            '40085' as ID_Cliente_Hfocus,
+            a.nr_atendimento AS "cd_atendimento",
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
-            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
-            b.DS_EMAIL_CCIH AS "email",
-            (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+            UPPER(tasy.obter_compl_pf(a.CD_PESSOA_FISICA, 1, 'M')) AS "email",
+            '55' || B.nr_ddd_celular || B.nr_telefone_celular AS "phone",
             a.NR_CPF as "cpf",
             'AMBULATORIO' AS "area_pesquisa",
             'Hospital São Francisco DF' AS "unidade",
             'AMBULATORIO_GERAL' as "setor"
-            from 
-            TASY.atendimento_paciente_v a,
-            TASY.pessoa_fisica b
-            where 1 = 1
-        
-            AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-            
-            and a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
-            AND A.DT_ALTA IS NOT NULL
+        from
+            tasy.atendimento_paciente_v a,
+            tasy.pessoa_fisica b
+        where
+            1 = 1
+            and a.CD_PESSOA_FISICA = b.cd_pessoa_fisica 
+            and trunc(a.dt_entrada) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            AND a.DT_ALTA IS NOT NULL
             and a.dt_cancelamento is null
-            AND A.IE_TIPO_ATENDIMENTO IN (8)
-            and a.CD_MOTIVO_ALTA not in (7,16,30,21,26,27,28)
-            
-            ------------Exames-------------------
-            
-            UNION ALL 
-            
-            select '40085' as ID_Cliente_Hfocus, 
+            AND a.IE_TIPO_ATENDIMENTO IN (8)
+            and a.CD_MOTIVO_ALTA not in (7, 16, 30, 21, 26, 27, 28)
+        group by
+            a.nr_atendimento,
+            a.DT_ENTRADA,
+            a.DT_ALTA,
+            a.NM_MEDICO,
+            a.NM_PACIENTE,
+            a.CD_PESSOA_FISICA,
+            b.nr_ddd_celular,
+            b.nr_telefone_celular,
+            a.NR_CPF
+
+        ------------ Bloco 5: Exames -------------------
+        UNION ALL
+
+        select
+            '40085' as ID_Cliente_Hfocus,
+            a.nr_atendimento AS "cd_atendimento",
             a.DT_ENTRADA AS "data_atendimento",
             a.DT_ALTA AS "data_saida_alta",
-            a.NR_ATENDIMENTO AS "cd_atendimento",
             a.NM_MEDICO AS "medico",
             a.NM_PACIENTE as "name",
-            b.DS_EMAIL_CCIH AS "email",
-            (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+            UPPER(tasy.obter_compl_pf(a.CD_PESSOA_FISICA, 1, 'M')) AS "email",
+            '55' || B.nr_ddd_celular || B.nr_telefone_celular AS "phone",
             a.NR_CPF as "cpf",
             'EXAMES' as "area_pesquisa",
             'Hospital São Francisco DF' AS "unidade",
-            decode(a.nr_seq_classificacao,2,'IMAGEM',6,'LABORATORIO',14,'LABORATORIO','16','IMAGEM') AS "setor"
-            from 
-            TASY.atendimento_paciente_v a,
-            TASY.pessoa_fisica b
-            where 1 = 1
-            
-            AND TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
-            
-            and a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
-            AND A.DT_ALTA IS NOT NULL
+            decode(a.nr_seq_classificacao, 2, 'IMAGEM', 6, 'LABORATORIO', 14, 'LABORATORIO', '16', 'IMAGEM') AS "setor"
+        from
+            tasy.atendimento_paciente_v a,
+            tasy.pessoa_fisica b
+        where
+            1 = 1
+            and a.CD_PESSOA_FISICA = b.cd_pessoa_fisica 
+            and trunc(a.dt_entrada) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            AND a.DT_ALTA IS NOT NULL
             and a.dt_cancelamento is null
-            AND A.IE_TIPO_ATENDIMENTO IN (7)
-            and a.CD_MOTIVO_ALTA not in (7,16,30,21,26,27,28)
-            AND A.nr_seq_classificacao IS NOT NULL
-            ORDER BY 3,9
+            AND a.IE_TIPO_ATENDIMENTO IN (7)
+            and a.CD_MOTIVO_ALTA not in (7, 16, 30, 21, 26, 27, 28)
+            AND a.nr_seq_classificacao IS NOT NULL
+        group by
+            a.nr_atendimento,
+            a.DT_ENTRADA,
+            a.DT_ALTA,
+            a.NM_MEDICO,
+            a.NM_PACIENTE,
+            a.CD_PESSOA_FISICA,
+            b.nr_ddd_celular,
+            b.nr_telefone_celular,
+            a.NR_CPF,
+            a.nr_seq_classificacao
+
+        ORDER BY
+            3, 9
         """
 
         cursor.execute(SQL, {'data': data})

@@ -48,24 +48,6 @@ def postDistribution(survey_uuid,distribution_channel,import_lines,template=None
         return 
 
     
-def postImportLines(survey_uuid,import_lines):
-   url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions/createLinkList"
-   headers = {
-       "Authorization": f"Bearer {API_TOKEN}"
-   }
-   data = {
-       "survey_uuid":survey_uuid,
-       "async": False,
-       "shortened_link": False,
-       "import_lines":import_lines,     
-   }
-   try:
-       response = requests.request("POST",url=url,headers=headers,json=data)
-       logging.info("Cliente selecionado "+str(datetime.now()))
-       return response.json()
-   except Exception as e:
-       logging.error(f"Erro na API: {e}")
-       return   
    
 #def postDistributionWhatsapp(survey_uuid,distribution_channel,import_lines): 
 #    url = f"{url_api}/v1/organizations/{ORGANIZATION_UUID}/distributions"

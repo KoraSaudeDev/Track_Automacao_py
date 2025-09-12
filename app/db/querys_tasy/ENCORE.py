@@ -16,21 +16,21 @@ def DB():
 
         SQL = """
             SELECT 
-                '40085' AS id_cliente,
+                '40085' as ID_Cliente_Hfocus, 
+                a.nr_atendimento AS "cd_atendimento",
                 a.DT_ENTRADA AS "data_atendimento",
                 a.DT_ALTA AS "data_saida_alta",
-                a.NR_ATENDIMENTO AS "cd_atendimento",
                 a.NM_MEDICO AS "medico",
                 a.NM_PACIENTE as "name",
-                b.DS_EMAIL_CCIH AS "email",
-                (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+                UPPER(USUARIO_PRINCIPAL.obter_compl_pf(a.CD_PESSOA_FISICA,1,'M')) AS "email",
+                '55' || REGEXP_REPLACE(USUARIO_PRINCIPAL.obter_telefone_pf(a.cd_pessoa_fisica, 12), '[^0-9]', '') AS "phone",
                 a.NR_CPF as "cpf",
                 CASE 
                     WHEN a.nr_seq_classificacao = 1 THEN 'AMBULATORIO'
                     WHEN a.nr_seq_classificacao <> 1 THEN 'EXAMES'
                     ELSE 'OUTROS' 
                 END AS "area_pesquisa",
-                'Hospital Encore' AS "unidade",
+                USUARIO_PRINCIPAL.obter_nome_fantasia_estab(a.cd_estabelecimento) AS "unidade",
                 CASE 
                     WHEN a.nr_seq_classificacao = 1 THEN 'AMBULATORIO'
                     WHEN a.cd_setor_atendimento = 357 THEN 'LABORATORIO'
@@ -39,82 +39,74 @@ def DB():
                     ELSE 'OUTROS' 
                 END AS "setor"
             FROM 
-                USUARIO_PRINCIPAL.atendimento_paciente_v a,
-                USUARIO_PRINCIPAL.pessoa_fisica b
+                USUARIO_PRINCIPAL.atendimento_paciente_v a
             WHERE 
-                TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))  
-                AND a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
+                a.dt_entrada BETWEEN TRUNC(SYSDATE - 1) AND TRUNC(SYSDATE) - 1 / 86400
                 AND a.ie_tipo_atendimento NOT IN (1, 3)
                 AND a.dt_cancelamento IS NULL
                 AND a.cd_estabelecimento = 21
             UNION
             SELECT 
-                '40085' AS id_cliente,
+                '40085' as ID_Cliente_Hfocus, 
+                a.nr_atendimento AS "cd_atendimento",
                 a.DT_ENTRADA AS "data_atendimento",
                 a.DT_ALTA AS "data_saida_alta",
-                a.NR_ATENDIMENTO AS "cd_atendimento",
                 a.NM_MEDICO AS "medico",
                 a.NM_PACIENTE as "name",
-                b.DS_EMAIL_CCIH AS "email",
-                (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+                UPPER(USUARIO_PRINCIPAL.obter_compl_pf(a.CD_PESSOA_FISICA,1,'M')) AS "email",
+                '55' || REGEXP_REPLACE(USUARIO_PRINCIPAL.obter_telefone_pf(a.cd_pessoa_fisica, 12), '[^0-9]', '') AS "phone",
                 a.NR_CPF as "cpf",
                 'EXAMES' AS "area_pesquisa",
-                'Hospital Encore' AS "unidade",
+                USUARIO_PRINCIPAL.obter_nome_fantasia_estab(21) AS "unidade",
                 'HEMODINAMICA' AS "setor"
             FROM 
-                USUARIO_PRINCIPAL.atendimento_paciente_v a,
-                USUARIO_PRINCIPAL.pessoa_fisica b
+                USUARIO_PRINCIPAL.atendimento_paciente_v a
             WHERE 
-                TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) 
-                AND a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
+                a.dt_alta BETWEEN TRUNC(SYSDATE - 1) AND TRUNC(SYSDATE)
                 AND a.ie_tipo_atendimento = 8
                 AND a.dt_cancelamento IS NULL
                 AND a.cd_estabelecimento IN (1, 2, 4)
                 AND a.cd_motivo_alta NOT IN (7, 8, 9, 10, 16, 23)
             UNION
             SELECT 
-                '40085' AS id_cliente,
+                '40085' as ID_Cliente_Hfocus, 
+                a.nr_atendimento AS "cd_atendimento",
                 a.DT_ENTRADA AS "data_atendimento",
                 a.DT_ALTA AS "data_saida_alta",
-                a.NR_ATENDIMENTO AS "cd_atendimento",
                 a.NM_MEDICO AS "medico",
                 a.NM_PACIENTE as "name",
-                b.DS_EMAIL_CCIH AS "email",
-                (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+                UPPER(USUARIO_PRINCIPAL.obter_compl_pf(a.CD_PESSOA_FISICA,1,'M')) AS "email",
+                '55' || REGEXP_REPLACE(USUARIO_PRINCIPAL.obter_telefone_pf(a.cd_pessoa_fisica, 12), '[^0-9]', '') AS "phone",
                 a.NR_CPF as "cpf",
                 'INTERNACAO' AS "area_pesquisa",
-                'Hospital Encore' AS "unidade",
+                USUARIO_PRINCIPAL.obter_nome_fantasia_estab(a.cd_estabelecimento) AS "unidade",
                 'INTERNACAO' AS "setor"
             FROM 
-                USUARIO_PRINCIPAL.atendimento_paciente_v a,
-                USUARIO_PRINCIPAL.pessoa_fisica b
+                USUARIO_PRINCIPAL.atendimento_paciente_v a
             WHERE 
-                TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) 
-                AND a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
+                a.dt_alta BETWEEN TRUNC(SYSDATE - 2) AND TRUNC(SYSDATE - 1)
                 AND a.ie_tipo_atendimento = 1
                 AND a.dt_cancelamento IS NULL
                 AND a.cd_estabelecimento = 21
                 AND a.cd_motivo_alta NOT IN (7, 8, 9, 10, 16, 23)
             UNION
             SELECT 
-                '40085' AS id_cliente,
+                '40085' as ID_Cliente_Hfocus, 
+                a.nr_atendimento AS "cd_atendimento",
                 a.DT_ENTRADA AS "data_atendimento",
                 a.DT_ALTA AS "data_saida_alta",
-                a.NR_ATENDIMENTO AS "cd_atendimento",
                 a.NM_MEDICO AS "medico",
                 a.NM_PACIENTE as "name",
-                b.DS_EMAIL_CCIH AS "email",
-                (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
+                UPPER(USUARIO_PRINCIPAL.obter_compl_pf(a.CD_PESSOA_FISICA,1,'M')) AS "email",
+                '55' || REGEXP_REPLACE(USUARIO_PRINCIPAL.obter_telefone_pf(a.cd_pessoa_fisica, 12), '[^0-9]', '') AS "phone",
                 a.NR_CPF as "cpf",
-                'PRONTO ATENDIMENTO' AS "area_pesquisa",
-                'Hospital Encore' AS "unidade",
+                'PRONTO_SOCORRO_GERAL' AS "area_pesquisa",
+                USUARIO_PRINCIPAL.obter_nome_fantasia_estab(a.cd_estabelecimento) AS "unidade",
                 'PA ADULTO' AS "setor"
             FROM 
-                USUARIO_PRINCIPAL.atendimento_paciente_v a,
-                USUARIO_PRINCIPAL.pessoa_fisica b
+                USUARIO_PRINCIPAL.atendimento_paciente_v a
             WHERE 
-                    TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) 
-                AND a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
+                a.dt_alta BETWEEN TRUNC(SYSDATE - 1) AND TRUNC(SYSDATE)
                 AND a.ie_tipo_atendimento = 3
                 AND a.dt_cancelamento IS NULL
                 AND a.cd_estabelecimento = 21
@@ -123,12 +115,12 @@ def DB():
                     SELECT k.cd_pessoa_fisica 
                     FROM USUARIO_PRINCIPAL.atendimento_paciente k 
                     WHERE k.ie_tipo_atendimento = 1 
-                    AND k.dt_entrada = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) 
+                    AND k.dt_entrada BETWEEN TRUNC(SYSDATE - 2) AND TRUNC(SYSDATE)
                 )
             ORDER BY 1, 2, 7, 9
         """
 
-        cursor.execute(SQL, {'data': data})
+        #cursor.execute(SQL, {'data': data})
 
         rows      = cursor.fetchall()
         columns   = [desc[0] for desc in cursor.description]

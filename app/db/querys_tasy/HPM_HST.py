@@ -15,48 +15,45 @@ def DB():
         data     = get_filtered_dates()[0]
 
         SQL = """
-            SELECT 
-                '40085' AS ID_Cliente_Hfocus,
-                a.DT_ENTRADA AS "data_atendimento",
-                a.DT_ALTA AS "data_saida_alta",
-                b.NM_PESSOA_FISICA AS "name",
-                b.DS_EMAIL_CCIH AS "email",
-                m.NM_PESSOA_FISICA AS "medico",
-                (NVL(b.NR_DDI_CELULAR, '55') || NVL(b.NR_DDD_CELULAR, '') || NVL(b.NR_TELEFONE_CELULAR, '')) AS "phone",
-                b.NR_CPF AS "cpf",
-                
-                CASE
-                    WHEN a.ie_tipo_atendimento = 3 THEN 'PRONTO SOCORRO GERAL'
-                    WHEN a.ie_tipo_atendimento = 1 THEN 'INTERNACAO'
-                    WHEN a.ie_tipo_atendimento = 7 THEN 'INTERNACAO'
-                    WHEN a.nr_atendimento IN (151, 164, 271, 269) THEN 'ONCOLOGIA'
-                    WHEN a.ie_tipo_atendimento = 8 AND a.nr_atendimento NOT IN (151, 164, 271, 269) THEN 'AMBULATORIO'
-                    WHEN a.nr_atendimento = 154 THEN 'AMBULATORIO'
-                END AS "area_pesquisa",
-                
-                CASE 
-                    WHEN a.cd_Estabelecimento IN (1, 71) THEN 'Hospital Palmas Medical' 
-                    WHEN a.cd_Estabelecimento = 81 THEN 'Hospital Santa Thereza'
-                END AS "unidade",
-                
-                CASE
-                    WHEN a.ie_tipo_atendimento = 3 THEN 'PA_ADULTO'
-                    WHEN a.ie_tipo_atendimento IN (1, 7) THEN 'INTERNACAO'
-                    WHEN a.ie_tipo_atendimento = 8 AND a.nr_atendimento NOT IN (151, 164, 271, 269) THEN 'GERAL_AMBULATORIO'
-                    WHEN a.nr_atendimento = 154 THEN 'GERAL_AMBULATORIO'
-                    WHEN a.nr_atendimento IN (151, 164, 271, 269) THEN 'ONCOLOGIA'
-                END AS "setor"
-                
-            FROM 
-                TASY.atendimento_paciente a
-            INNER JOIN TASY.pessoa_fisica b ON a.CD_PESSOA_FISICA = b.cd_pessoa_fisica
+            select '40085'
+            ID_Cliente_Hfocus,
+            a.DT_ENTRADA AS "data_atendimento",
+            a.DT_ALTA AS "data_saida_alta",
+            a.NR_ATENDIMENTO AS "cd_atendimento",
+            m.NM_PESSOA_FISICA AS "medico",
+            tasy.obter_nome_paciente(a.nr_atendimento) AS "name",
+            tasy.obter_email_pf_hpm(a.cd_pessoa_fisica) AS "email",
+            ('55' || ltrim(replace( translate(tasy.obter_telefone_pf(a.cd_pessoa_fisica, 12),translate(tasy.obter_telefone_pf(a.cd_pessoa_fisica, 12), '1234567890', ' '),' '),' ', ''))) AS "phone",
+            tasy.obter_cpf_pessoa_fisica(a.cd_pessoa_fisica)"cpf",
+                    case
+                    when a.ie_tipo_atendimento = 3 then 'PRONTO_SOCORRO_GERAL'
+                    when a.ie_tipo_atendimento = 1 then 'INTERNACAO'
+                    when a.ie_tipo_atendimento = 7 then 'INTERNACAO'
+                    when tasy.obter_primeiro_setor_atend(a.nr_atendimento,'C') IN (151, 164,271,269) then 'ONCOLOGIA'
+                    when a.ie_tipo_atendimento = 8 and tasy.obter_primeiro_setor_atend(a.nr_atendimento,'C') not IN (151, 164,271,269) then 'AMBULATORIO'
+                    when tasy.obter_primeiro_setor_atend(a.nr_atendimento,'C') IN 154 then 'AMBULATORIO'
+                    end "area_pesquisa",
+                    case 
+                        when a.cd_Estabelecimento in (1,71) then 'Hospital Palmas Medical' 
+                        when a.cd_Estabelecimento in 81 then 'Hospital Santa Thereza'
+                    end 
+                    AS "unidade",
+                    case
+                        when a.ie_tipo_atendimento = 3 THEN 'PA_ADULTO'
+                    when a.ie_tipo_atendimento = 1 THEN 'INTERNACAO'
+                    when a.ie_tipo_atendimento = 7 then 'INTERNACAO'
+                    when a.ie_tipo_atendimento = 8 and tasy.obter_primeiro_setor_atend(a.nr_atendimento,'C') not IN (151, 164,271,269)  then 'GERAL_AMBULATORIO'
+                    when tasy.obter_primeiro_setor_atend(a.nr_atendimento,'C') IN 154 then 'GERAL_AMBULATORIO'
+                    when tasy.obter_primeiro_setor_atend(a.nr_atendimento,'C') IN (151, 164,271,269) then 'ONCOLOGIA'
+                    END AS "setor"
+                        FROM 
+            TASY.atendimento_paciente a
             INNER JOIN TASY.pessoa_fisica m ON a.CD_MEDICO_RESP = m.CD_PESSOA_FISICA
-            WHERE 
-                
-                TRUNC(A.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) 
-                AND a.dt_cancelamento IS NULL
-                AND a.cd_estabelecimento IN (1, 71, 81)
-                AND a.cd_motivo_alta NOT IN (18, 13, 9, 7, 16, 15)
+            where trunc(a.DT_ALTA)>= TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) -3
+            and  trunc(a.DT_ALTA) < TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            and a.dt_cancelamento is null
+            and a.cd_estabelecimento in (1,71,81)
+            and   a.cd_motivo_alta not in (18,13,9,7,16,15)
         """
 
         cursor.execute(SQL, {'data': data})

@@ -12,7 +12,6 @@ def DB():
         conn     = db.get_connection_tasy("ENCORE")
         cursor   = conn.cursor()
 
-        data     = get_filtered_dates()[0]
 
         SQL = """
             SELECT 
@@ -120,7 +119,7 @@ def DB():
             ORDER BY 1, 2, 7, 9
         """
 
-        #cursor.execute(SQL, {'data': data})
+        cursor.execute(SQL)
 
         rows      = cursor.fetchall()
         columns   = [desc[0] for desc in cursor.description]

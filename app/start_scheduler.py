@@ -20,7 +20,7 @@ def start_all():
                  'HMSM','HMV','HSL',
                  'HSF','OTOA','OTOSD', 
                  'OTOM','OTOS','HAT',
-                 'HAC','HPM_HST','HSMC',
+                 'HAC','HPM','HST','HSMC',
                  "ING","ENCORE"]
 
     schedulers.schedule_task(hospital=hospitals)

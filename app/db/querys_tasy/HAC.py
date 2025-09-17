@@ -45,7 +45,7 @@ def DB():
             and a.dt_cancelamento is null
             and a.CD_MOTIVO_ALTA not in (7, 16, 30, 21, 26, 27, 28)
             AND c.CD_SETOR_ATENDIMENTO <> 54
-            --AND tasy.obter_DADOS_PF(A.CD_PESSOA_FISICA, 'I') >= 1
+            AND tasy.obter_DADOS_PF(A.CD_PESSOA_FISICA, 'I') >= 1
         group by
             a.nr_atendimento,
             a.DT_ENTRADA,
@@ -87,7 +87,7 @@ def DB():
             and a.dt_cancelamento is null
             and a.CD_MOTIVO_ALTA not in (7, 16, 30, 21, 26, 27, 28)
             AND c.CD_SETOR_ATendimento = 54
-            --AND tasy.obter_DADOS_PF(A.CD_PESSOA_FISICA, 'I') >= 1
+            AND tasy.obter_DADOS_PF(A.CD_PESSOA_FISICA, 'I') >= 1
         group by
             a.nr_atendimento,
             a.DT_ENTRADA,
@@ -112,7 +112,7 @@ def DB():
             UPPER(tasy.obter_compl_pf(a.CD_PESSOA_FISICA, 1, 'M')) AS "email",
             '55' || B.nr_ddd_celular || B.nr_telefone_celular AS "phone",
             a.NR_CPF as "cpf",
-            'PRONTO_SOCORRO_GERAL' as "area_pesquisa",
+            'PRONTO SOCORRO GERAL' as "area_pesquisa",
             'Hospital São Francisco DF' AS "unidade",
             decode(a.IE_CLINICA, 13, 'PA_GINECOLOGICO', 10, 'PA_PEDIATRICO', 4, 'PA_PEDIATRICO', 'PA_ADULTO') AS "setor"
         from

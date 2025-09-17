@@ -26,7 +26,7 @@ def DB():
             ('55' || ltrim(replace( translate(tasy.obter_telefone_pf(a.cd_pessoa_fisica, 12),translate(tasy.obter_telefone_pf(a.cd_pessoa_fisica, 12), '1234567890', ' '),' '),' ', ''))) AS "phone",
             tasy.obter_cpf_pessoa_fisica(a.cd_pessoa_fisica)"cpf",
                     case
-                    when a.ie_tipo_atendimento = 3 then 'PRONTO_SOCORRO_GERAL'
+                    when a.ie_tipo_atendimento = 3 then 'PRONTO SOCORRO GERAL'
                     when a.ie_tipo_atendimento = 1 then 'INTERNACAO'
                     when a.ie_tipo_atendimento = 7 then 'INTERNACAO'
                     when tasy.obter_primeiro_setor_atend(a.nr_atendimento,'C') IN (151, 164,271,269) then 'ONCOLOGIA'
@@ -49,10 +49,9 @@ def DB():
                         FROM 
             TASY.atendimento_paciente a
             INNER JOIN TASY.pessoa_fisica m ON a.CD_MEDICO_RESP = m.CD_PESSOA_FISICA
-            where trunc(a.DT_ALTA)>= TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3')) -3
-            and  trunc(a.DT_ALTA) < TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
+            where trunc(a.DT_ALTA) = TRUNC(TO_TIMESTAMP(:data, 'YYYY-MM-DD HH24:MI:SS.FF3'))
             and a.dt_cancelamento is null
-            and a.cd_estabelecimento in (1,71,81)
+            and a.cd_estabelecimento in (81)
             and   a.cd_motivo_alta not in (18,13,9,7,16,15)
         """
 

@@ -21,7 +21,7 @@ def DB():
             SELECT
                 '40085' AS "ID_Cliente_Hfocus", a.hr_atendimento AS "data_atendimento",A.HR_ALTA AS "data_saida_alta",A.CD_ATENDIMENTO AS "cd_atendimento", p.nm_paciente AS "name",PR.NM_PRESTADOR AS "medico",
                 p.email AS "email", (NVL(p.nr_ddi_celular, '55') || NVL(p.nr_ddd_celular, '') || NVL(p.nr_celular, '')) AS "phone",
-                p.nr_cpf AS "cpf", 'PRONTO_SOCORRO_GERAL' AS "area_pesquisa", 'Hospital São Mateus' AS "unidade",
+                p.nr_cpf AS "cpf", 'PRONTO SOCORRO GERAL' AS "area_pesquisa", 'Hospital São Mateus' AS "unidade",
                 CASE WHEN a.cd_servico = 40 THEN 'PA_PEDIATRICO' ELSE 'PA_ADULTO' END AS "setor"
             FROM dbamv.paciente p
             INNER JOIN dbamv.atendime a ON p.cd_paciente = a.cd_paciente

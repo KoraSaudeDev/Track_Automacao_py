@@ -25,7 +25,7 @@ def start_hospital_scheduler(hospital, template=None, teste=None):
                  'HMSM','HMV','HSL',
                  'HSF','OTOA','OTOSD', 
                  'OTOM','OTOS','HAT',
-                 'HAC','HPM_HST','HSMC',
+                 'HAC','HPM','HST','HSMC',
                  "ING","ENCORE"]
                 
             for h in hospital:

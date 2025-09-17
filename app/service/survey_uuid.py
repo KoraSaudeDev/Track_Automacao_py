@@ -1,7 +1,7 @@
 from app.db.querys_mv.HUB_ES import HMC, HMS, HPC, HMV, HSF, HSL, HMSM
 from app.db.querys_mv.ING_OTO import OTOA, OTOSD, OTOM, OTOS,ING
 from app.db.querys_mv import HAT
-from app.db.querys_tasy import HAC,HPM_HST,HSMC,ENCORE
+from app.db.querys_tasy import HAC,HSMC,ENCORE, HST, HPM
 import app.db.teste as teste
 
 def get_survey_uuid(hospital):
@@ -137,6 +137,56 @@ def get_survey_uuid(hospital):
             "maternidade": "2b84ca2e-c4e3-445d-b485-b9492d31855c"
         }
 
+    elif hospital == 'ENCORE':
+        return {
+            "internacao": "85a7972b-6c1f-49a1-908d-ffa22968f910",
+            "ambulatorio": "b466f014-aa1c-42b2-9e43-5286a9167b9d",
+            "exames": "01233aed-5330-40ff-93ab-4d455fef1623",
+            "oncologia": "b0728a22-22f9-4b4c-86ae-2a19903628f4",
+            "pronto_socorro": "07f9aa97-44b9-42d2-ba0f-a2fef26741f1",
+            "maternidade": "27c8847f-7b6e-4f7f-bd02-b04ec2f6b983"
+        }
+
+    elif hospital == 'HSMC':
+        return {
+            "internacao": "18b941ae-1999-4c69-a7a4-91e46dad2e0c",
+            "ambulatorio": "4ef6b4af-055b-4457-a172-9d2d8964c7d1",
+            "exames": "a66db0fb-1f6b-4a2b-8d61-2f2cb20ca208",
+            "oncologia": "e7f6a827-94e6-4d3f-a296-fe06dc1aa0be",
+            "pronto_socorro": "bcbacc3f-0476-4c04-b77a-e1cd58e07560",
+            "maternidade": "fbca8a3c-7707-473d-8784-672ef3318ce2"
+        }
+
+    elif hospital == 'HAC':
+        return {
+            "internacao": "64ee1339-9348-4ab3-b1b5-945dbaf0c03f",
+            "ambulatorio": "76174ced-d30a-424d-bb16-37fd7541a1dd",
+            "exames": "d64a68cf-930f-4ea3-bc62-b3862bb66836",
+            "oncologia": "a1e006a5-c1fb-42ba-8e9d-abdf00f9b803",
+            "pronto_socorro": "3ce2424f-8d1a-44ef-ba46-cf93877002db",
+            "maternidade": "6d3f1bcc-f0e5-42bf-a51a-0cee515bbd01"
+        }
+
+    elif hospital == 'HPM':
+        return {
+            "internacao": "2442176b-a6b1-422b-b022-996863e1ddce",
+            "ambulatorio": "14133bcc-3b23-4687-a6ce-3b95552991a0",
+            "exames": "d2a63406-f7b6-47e1-842c-21ba168aa4b2",
+            "oncologia": "83881774-9e15-4064-8eca-109e4631a1b4",
+            "pronto_socorro": "64ff4519-2bf1-4173-9e11-9b915c6a80fb",
+            "maternidade": "bd83c443-fcfd-43e1-b84b-7f7270393e7f"
+        }
+
+    elif hospital == 'HST':
+        return {
+            "internacao": "df5078f3-833c-405d-af94-966a6a2aea2b",
+            "ambulatorio": "b6540194-2ff0-4653-9582-68162eb775f3",
+            "exames": "9f984468-6681-409f-b72f-45a5ff626a9b",
+            "oncologia": "c55e36cf-39fa-4bed-9ef7-53f483be3244",
+            "pronto_socorro": "d9659af0-79a2-48b4-9098-9a6deefb9524",
+            "maternidade": "f4b33df5-b9fb-4a36-ae07-2270adf471ca"
+        }
+
     else:
         return {
             "ambulatorio": None,
@@ -158,7 +208,8 @@ def get_hospital():
         "HMSM": HMSM,
         "HAT": HAT,
         "HAC": HAC,
-        "HPM_HST": HPM_HST,
+        "HST": HST,
+        "HPM": HPM,
         "HSMC": HSMC,
         "OTOA": OTOA,
         "OTOSD": OTOSD, 

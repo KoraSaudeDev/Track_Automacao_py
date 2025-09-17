@@ -33,7 +33,7 @@ def DB():
 
               CASE
                   WHEN a.tp_atendimento = 'A' AND s.cd_setor = 637 THEN 'ONCOLOGIA'
-                  WHEN a.tp_atendimento = 'U' THEN 'PRONTO_SOCORRO_GERAL'
+                  WHEN a.tp_atendimento = 'U' THEN 'PRONTO SOCORRO GERAL'
                   WHEN a.tp_atendimento = 'I' THEN 'INTERNACAO'
                   WHEN a.tp_atendimento = 'E' THEN 'EXAMES'
                   WHEN a.tp_atendimento = 'A' THEN 'AMBULATORIO'

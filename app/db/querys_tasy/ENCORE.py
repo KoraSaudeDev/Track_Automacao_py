@@ -99,7 +99,7 @@ def DB():
                 UPPER(USUARIO_PRINCIPAL.obter_compl_pf(a.CD_PESSOA_FISICA,1,'M')) AS "email",
                 '55' || REGEXP_REPLACE(USUARIO_PRINCIPAL.obter_telefone_pf(a.cd_pessoa_fisica, 12), '[^0-9]', '') AS "phone",
                 a.NR_CPF as "cpf",
-                'PRONTO_SOCORRO_GERAL' AS "area_pesquisa",
+                'PRONTO SOCORRO GERAL' AS "area_pesquisa",
                 USUARIO_PRINCIPAL.obter_nome_fantasia_estab(a.cd_estabelecimento) AS "unidade",
                 'PA ADULTO' AS "setor"
             FROM 
